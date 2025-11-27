@@ -1,31 +1,51 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import styles from './login.module.css';
 
 export default function LoginPage() {
-    const { user, loading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!loading && user) {
+        if (!authLoading && user) {
             router.push('/');
         }
-    }, [user, loading, router]);
+    }, [user, authLoading, router]);
 
     const handleGoogleLogin = async () => {
         try {
             await signInWithPopup(auth, googleProvider);
-            // Redirect or handle successful login
-            console.log("Google login successful");
+            // Redirect handled by useEffect
         } catch (error) {
             console.error("Error signing in with Google", error);
+            setError("Failed to sign in with Google.");
+        }
+    };
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            // Redirect handled by useEffect
+        } catch (err: any) {
+            console.error("Error logging in", err);
+            setError("Invalid email or password.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,13 +74,17 @@ export default function LoginPage() {
                 <h1 className={styles.title}>Welcome to DrEagle</h1>
                 <p className={styles.subtitle}>Your Gateway to Intelligent Interaction</p>
 
-                <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+                {error && <p style={{ color: '#ff6b6b', marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
+
+                <form className={styles.form} onSubmit={handleLogin}>
                     <div className={styles.inputGroup}>
                         <input
                             type="email"
                             placeholder="Enter your email"
                             className={styles.input}
                             required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -70,11 +94,13 @@ export default function LoginPage() {
                             placeholder="Enter your password"
                             className={styles.input}
                             required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 
-                    <button type="submit" className={styles.submitButton}>
-                        Login
+                    <button type="submit" className={styles.submitButton} disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 
@@ -93,7 +119,7 @@ export default function LoginPage() {
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    Google account
+                    Continue with Google
                 </button>
             </div>
         </div>

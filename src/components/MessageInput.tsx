@@ -60,10 +60,6 @@ export default function MessageInput({ value, onChange, onSend, disabled }: Mess
           </div>
         </div>
       </div>
-      <div className="input-footer">
-        <span className="model-selector">Sonnet 3.5 <span className="chevron">▼</span></span>
-      </div>
-
       <style jsx>{`
         .input-container {
           width: 100%;
@@ -75,14 +71,15 @@ export default function MessageInput({ value, onChange, onSend, disabled }: Mess
         }
 
         .input-box {
-          background-color: var(--bg-secondary);
+          background-color: #ffffff; /* Solid white background */
           border: 1px solid var(--border-subtle);
           border-radius: var(--radius-lg);
           padding: var(--spacing-md);
           display: flex;
           flex-direction: column;
           gap: var(--spacing-sm);
-          transition: border-color 0.2s;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Elevated shadow */
         }
 
         .input-box:focus-within {
@@ -153,29 +150,6 @@ export default function MessageInput({ value, onChange, onSend, disabled }: Mess
           cursor: not-allowed;
           background: var(--bg-tertiary);
           color: var(--text-secondary);
-        }
-
-        .input-footer {
-          display: flex;
-          justify-content: flex-end;
-          padding: 0 var(--spacing-sm);
-        }
-
-        .model-selector {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .model-selector:hover {
-          color: var(--text-primary);
-        }
-
-        .chevron {
-          font-size: 0.6rem;
         }
       `}</style>
     </div>

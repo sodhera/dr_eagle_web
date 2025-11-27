@@ -7,8 +7,10 @@ import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'tool';
   content: string;
+  tool_call_id?: string;
+  name?: string;
 }
 
 export default function Home() {
@@ -45,25 +47,8 @@ export default function Home() {
     setInputValue('');
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
-
-    // Add user message
-    const newMessages: Message[] = [
-      ...messages,
-      { role: 'user', content: inputValue }
-    ];
-    setMessages(newMessages);
-    setInputValue('');
-
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: "I'm DrEagle, your AI assistant. I'm currently in a rudimentary state, but I can echo your thoughts and help you plan! \n\nThat sounds like a great idea. Tell me more about it." }
-      ]);
-    }, 1000);
-  };
+  // ChatArea now handles the sending logic internally
+  const handleSend = () => { };
 
   const handleSuggestionClick = (text: string) => {
     setInputValue(text);
@@ -80,12 +65,8 @@ export default function Home() {
       />
       <div className={`main-content ${!isSidebarOpen ? 'expanded' : ''}`}>
         {!isSidebarOpen && (
-          <button className="sidebar-toggle-fixed" onClick={handleToggleSidebar} aria-label="Open Sidebar">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <line x1="9" y1="3" x2="9" y2="21" />
-            </svg>
-          </button>
+          <>
+          </>
         )}
         <ChatArea
           messages={messages}
@@ -93,6 +74,7 @@ export default function Home() {
           onInputChange={setInputValue}
           onSend={handleSend}
           onSuggestionClick={handleSuggestionClick}
+          setMessages={setMessages}
         />
       </div>
 
@@ -109,28 +91,6 @@ export default function Home() {
           position: relative;
           display: flex;
           flex-direction: column;
-        }
-
-        .sidebar-toggle-fixed {
-          position: absolute;
-          top: var(--spacing-md);
-          left: var(--spacing-md);
-          z-index: 10;
-          background: transparent;
-          border: none;
-          color: var(--text-secondary);
-          cursor: pointer;
-          padding: 8px;
-          border-radius: var(--radius-md);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background-color 0.2s, color 0.2s;
-        }
-
-        .sidebar-toggle-fixed:hover {
-          background-color: var(--bg-tertiary);
-          color: var(--text-primary);
         }
       `}</style>
     </div>
