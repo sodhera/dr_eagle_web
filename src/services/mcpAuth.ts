@@ -1,6 +1,6 @@
 import { auth } from '@/lib/firebase';
 
-const MCP_BASE_URL = '/api/mcp';
+const MCP_BASE_URL = 'https://us-central1-audit-3a7ec.cloudfunctions.net';
 const AUTH_TOKEN_TTL_SECONDS = 3600; // 1 hour default
 const REFRESH_BUFFER_SECONDS = 300; // Refresh 5 minutes before expiry
 
@@ -48,7 +48,6 @@ export async function getMcpToken(): Promise<string> {
                 },
                 body: JSON.stringify({
                     idToken,
-                    // Request all necessary scopes for full functionality
                     scopes: [
                         'polymarket:read:public',
                         'polymarket:read:user',

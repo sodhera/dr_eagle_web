@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import MessageInput from './MessageInput';
-import { callMcpTool } from '../services/mcpClient';
+import { sendMessage } from '../services/agentClient';
 
 interface Message {
   role: 'user' | 'assistant' | 'tool';
@@ -53,113 +53,19 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSend, 
   };
 
   const processChatLoop = async (currentMessages: Message[]) => {
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: currentMessages }),
-    });
+    // We only send the last user message to the agent API
+    // The agent handles history persistence on the backend
+    const lastMessage = currentMessages[currentMessages.length - 1];
+    if (lastMessage.role !== 'user') return;
 
-    const data = await response.json();
-    const assistantMessage = data.message;
+    const response = await sendMessage(lastMessage.content);
 
-    if (assistantMessage.tool_calls) {
-      // Handle tool calls
-      const toolMessages: Message[] = [];
+    // The backend returns the full session history, but for now we just want to append the new assistant message
+    // We can assume the last message in the returned history is the assistant's response
+    const assistantResponse = response.messages[response.messages.length - 1];
 
-      // Update state to show the tool call request
-      // We cast to Message to satisfy our interface
-      const assistantMsgForState: Message = {
-        role: 'assistant',
-        content: assistantMessage.content || "",
-        tool_calls: assistantMessage.tool_calls
-      };
-
-      // We need to update the UI *before* we process the tools so the user sees "Calling tool..."
-      // But since we are in a loop, we need to be careful with state updates.
-      // We'll accumulate messages in `currentMessages` for the API, but we also need to push to React state.
-      // Actually, let's just update the state at the end of this block with both the request and the results.
-
-      for (const toolCall of assistantMessage.tool_calls) {
-        const functionName = toolCall.function.name;
-        const functionArgs = JSON.parse(toolCall.function.arguments);
-
-        console.log(`🛠️ [MCP] Calling tool: ${functionName}`, functionArgs);
-
-        let result;
-        try {
-          if (functionName === 'list_markets') {
-            const args = { active: true, ...functionArgs };
-            result = await callMcpTool('polymarketReadMcp', 'list-markets', args);
-          } else if (functionName === 'list_active_markets_by_volume') {
-            // Try using the native list-active-markets-by-volume tool
-            result = await callMcpTool('polymarketReadMcp', 'list-active-markets-by-volume', functionArgs);
-          } else if (functionName === 'get_market') {
-            result = await callMcpTool('polymarketReadMcp', 'get-market', { marketIdOrSlug: functionArgs.id });
-          } else if (functionName === 'search_entities') {
-            result = await callMcpTool('polymarketReadMcp', 'search-entities', functionArgs);
-          } else if (functionName === 'get_market_pricing') {
-            result = await callMcpTool('polymarketReadMcp', 'get-market-pricing', functionArgs);
-          } else if (functionName === 'compare_weekly_movement') {
-            result = await callMcpTool('polymarketReadMcp', 'compare-weekly-movement', functionArgs);
-          } else if (functionName === 'get_btc_price') {
-            result = await callMcpTool('marketDataMcp', 'get-btc-price', functionArgs);
-          } else if (functionName === 'get_user_positions') {
-            result = await callMcpTool('polymarketReadMcp', 'get-user-positions', functionArgs);
-          } else if (functionName === 'get_user_trades') {
-            result = await callMcpTool('polymarketReadMcp', 'get-user-trades', functionArgs);
-          } else if (functionName === 'get_total_value_of_positions') {
-            result = await callMcpTool('polymarketReadMcp', 'get-total-value-of-positions', functionArgs);
-          } else if (functionName === 'get_live_volume') {
-            result = await callMcpTool('polymarketReadMcp', 'get-live-volume', functionArgs);
-          } else if (functionName === 'get_open_interest') {
-            result = await callMcpTool('polymarketReadMcp', 'get-open-interest', functionArgs);
-          } else if (functionName === 'get_market_volume') {
-            result = await callMcpTool('polymarketReadMcp', 'get-market-volume', functionArgs);
-          } else if (functionName === 'list_events') {
-            result = await callMcpTool('polymarketReadMcp', 'list-events', functionArgs);
-          } else if (functionName === 'get_event') {
-            result = await callMcpTool('polymarketReadMcp', 'get-event', functionArgs);
-          } else if (functionName === 'get_price_history') {
-            result = await callMcpTool('polymarketReadMcp', 'get-price-history', functionArgs);
-          } else {
-            result = { error: "Unknown tool" };
-          }
-        } catch (e: any) {
-          result = { error: e.message };
-        }
-
-        console.log(`✅ [MCP] Result from ${functionName}:`, result);
-
-        toolMessages.push({
-          role: 'tool',
-          tool_call_id: toolCall.id,
-          name: functionName,
-          content: JSON.stringify(result)
-        });
-      }
-
-      // Update UI with the assistant's request AND the tool results
-      // We DON'T want to show the tool calls in the UI anymore, but we need them in the state for the chat history context
-      // So we add them to messages, but we will filter them out in the render
-      setMessages(prev => [
-        ...prev,
-        assistantMsgForState,
-        ...toolMessages
-      ]);
-
-      // Recursive call with tool results
-      // We need to include the assistant message that initiated the call
-      const updatedMessages = [
-        ...currentMessages,
-        { ...assistantMessage, role: 'assistant' }, // Ensure role is set
-        ...toolMessages
-      ];
-
-      await processChatLoop(updatedMessages);
-
-    } else {
-      // Final text response
-      setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage.content }]);
+    if (assistantResponse && assistantResponse.role === 'assistant') {
+      setMessages(prev => [...prev, { role: 'assistant', content: assistantResponse.content }]);
     }
   };
 
