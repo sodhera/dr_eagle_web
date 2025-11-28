@@ -43,7 +43,7 @@ export default function Dashboard() {
         <div className="chart-card">
           <h3>Weekly Activity</h3>
           <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <LineChart data={activityData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0de" />
                 <XAxis dataKey="name" stroke="#6e6d6b" fontSize={12} />
@@ -61,7 +61,7 @@ export default function Dashboard() {
         <div className="chart-card">
           <h3>Model Usage</h3>
           <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={usageData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0de" />
                 <XAxis dataKey="name" stroke="#6e6d6b" fontSize={12} />

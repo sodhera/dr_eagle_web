@@ -1,7 +1,7 @@
 import { getMcpToken } from './mcpAuth';
 
-// Use the proxy path defined in next.config.ts
-const AGENT_BASE_URL = '/api/mcp';
+// Fixed URL as per plan.md
+const AGENT_BASE_URL = 'https://us-central1-audit-3a7ec.cloudfunctions.net';
 
 export interface ToolCall {
     id: string;
