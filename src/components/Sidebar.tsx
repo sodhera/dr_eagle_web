@@ -3,19 +3,40 @@ import { useAuth } from '@/context/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import { getUserSessions, ChatSession } from '@/services/agentClient';
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onNewChat: () => void;
+  onSelectChat: (sessionId: string) => void;
+  currentSessionId: string | null;
+  refreshTrigger?: number; // Optional prop to force refresh
 }
 
-export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, currentSessionId, refreshTrigger }: SidebarProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [showSettings, setShowSettings] = useState(false);
+  const [chats, setChats] = useState<ChatSession[]>([]);
   const settingsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      loadChats();
+    }
+  }, [user, refreshTrigger]);
+
+  const loadChats = async () => {
+    if (!user) return;
+    try {
+      const userChats = await getUserSessions();
+      setChats(userChats);
+    } catch (error) {
+      console.error("Failed to load chats:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -26,29 +47,35 @@ export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // If click is inside profile container (which includes popup), do nothing.
-      // Let the onClick handler on user-profile manage the toggle.
-      if (profileRef.current && profileRef.current.contains(event.target as Node)) {
-        return;
-      }
-
-      // Otherwise, if click is outside, close it.
-      if (showSettings) {
-        setShowSettings(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showSettings]);
+  // ... (handleClickOutside effect remains same)
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  };
+
+  const formatDate = (timestamp: number) => {
+    // Check if timestamp is in seconds (10 digits) or milliseconds (13 digits)
+    // If it's likely seconds (less than year 3000 in seconds), multiply by 1000
+    const date = new Date(timestamp < 10000000000 ? timestamp * 1000 : timestamp);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString();
+  };
+
+  // Helper to get a title from messages if not explicit (though backend might provide title later, for now we infer or use first message)
+  // The ChatSession interface doesn't have a 'title' field in the plan, but it has 'messages'.
+  // Wait, the plan says: "messages": [...] // Full session objects.
+  // It doesn't explicitly say there is a title field.
+  // So we should derive title from the first user message.
+  const getChatTitle = (session: ChatSession) => {
+    const firstUserMsg = session.messages.find(m => m.role === 'user');
+    return firstUserMsg ? firstUserMsg.content.substring(0, 30) : 'New Chat';
   };
 
   return (
@@ -70,18 +97,16 @@ export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
       <div className="sidebar-content">
         <div className="section-title">Your chats</div>
         <ul className="chat-list">
-          <li className="chat-item active">
-            <span className="chat-title">DrEagle Planning</span>
-            <span className="chat-date">Today</span>
-          </li>
-          <li className="chat-item">
-            <span className="chat-title">React Components</span>
-            <span className="chat-date">Yesterday</span>
-          </li>
-          <li className="chat-item">
-            <span className="chat-title">CSS Variables</span>
-            <span className="chat-date">2 days ago</span>
-          </li>
+          {chats.map(chat => (
+            <li
+              key={chat.id}
+              className={`chat-item ${currentSessionId === chat.id ? 'active' : ''}`}
+              onClick={() => onSelectChat(chat.id)}
+            >
+              <span className="chat-title">{getChatTitle(chat)}</span>
+              <span className="chat-date">{formatDate(chat.createdAt)}</span>
+            </li>
+          ))}
         </ul>
       </div>
 

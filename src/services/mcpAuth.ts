@@ -1,6 +1,7 @@
 import { auth } from '@/lib/firebase';
 
-const MCP_BASE_URL = 'https://us-central1-audit-3a7ec.cloudfunctions.net';
+// Use the proxy path defined in next.config.ts
+const MCP_BASE_URL = '/api/mcp';
 const AUTH_TOKEN_TTL_SECONDS = 3600; // 1 hour default
 const REFRESH_BUFFER_SECONDS = 300; // Refresh 5 minutes before expiry
 

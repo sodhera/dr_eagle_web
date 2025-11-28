@@ -5,13 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
-
-interface Message {
-  role: 'user' | 'assistant' | 'tool';
-  content: string;
-  tool_call_id?: string;
-  name?: string;
-}
+import { getChatHistory, Message } from '@/services/agentClient';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -19,6 +13,8 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [refreshSidebarTrigger, setRefreshSidebarTrigger] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -45,15 +41,27 @@ export default function Home() {
   const handleNewChat = () => {
     setMessages([]);
     setInputValue('');
+    setCurrentSessionId(null);
   };
 
-  // ChatArea now handles the sending logic internally
-  const handleSend = () => { };
+  const handleSelectChat = async (sessionId: string) => {
+    try {
+      setCurrentSessionId(sessionId);
+      const history = await getChatHistory(sessionId);
+      setMessages(history.messages);
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+    }
+  };
+
+  const handleSessionCreated = (sessionId: string, firstMessage: string) => {
+    setCurrentSessionId(sessionId);
+    // Trigger sidebar refresh to show the new chat
+    setRefreshSidebarTrigger(prev => prev + 1);
+  };
 
   const handleSuggestionClick = (text: string) => {
     setInputValue(text);
-    // Optional: auto-send on click
-    // handleSendMessage(); 
   };
 
   return (
@@ -62,6 +70,9 @@ export default function Home() {
         isOpen={isSidebarOpen}
         onToggle={handleToggleSidebar}
         onNewChat={handleNewChat}
+        onSelectChat={handleSelectChat}
+        currentSessionId={currentSessionId}
+        refreshTrigger={refreshSidebarTrigger}
       />
       <div className={`main-content ${!isSidebarOpen ? 'expanded' : ''}`}>
         {!isSidebarOpen && (
@@ -72,9 +83,10 @@ export default function Home() {
           messages={messages}
           inputValue={inputValue}
           onInputChange={setInputValue}
-          onSend={handleSend}
           onSuggestionClick={handleSuggestionClick}
           setMessages={setMessages}
+          sessionId={currentSessionId}
+          onSessionCreated={handleSessionCreated}
         />
       </div>
 

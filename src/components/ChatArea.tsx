@@ -1,26 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import MessageInput from './MessageInput';
-import { sendMessage } from '../services/agentClient';
-
-interface Message {
-  role: 'user' | 'assistant' | 'tool';
-  content: string;
-  tool_call_id?: string;
-  name?: string;
-  tool_calls?: any[]; // Add this to support typing
-}
+import { sendMessage, Message } from '../services/agentClient';
 
 interface ChatAreaProps {
   messages: Message[];
   inputValue: string;
   onInputChange: (value: string) => void;
-  onSend: () => void;
   onSuggestionClick: (text: string) => void;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  sessionId: string | null;
+  onSessionCreated: (sessionId: string, firstMessage: string) => void;
 }
 
-export default function ChatArea({ messages, inputValue, onInputChange, onSend, onSuggestionClick, setMessages }: ChatAreaProps) {
+export default function ChatArea({ messages, inputValue, onInputChange, onSuggestionClick, setMessages, sessionId, onSessionCreated }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +28,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSend, 
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: inputValue };
+    const userMessage: Message = { role: 'user', content: inputValue, timestamp: Date.now() / 1000 };
     const newMessages = [...messages, userMessage];
 
     setMessages(newMessages);
@@ -43,29 +36,35 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSend, 
     setIsLoading(true);
 
     try {
-      await processChatLoop(newMessages);
+      await processChatLoop(newMessages, inputValue);
     } catch (error) {
       console.error("Chat error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error." }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error.", timestamp: Date.now() / 1000 }]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const processChatLoop = async (currentMessages: Message[]) => {
+  const processChatLoop = async (currentMessages: Message[], originalInput: string) => {
     // We only send the last user message to the agent API
     // The agent handles history persistence on the backend
     const lastMessage = currentMessages[currentMessages.length - 1];
     if (lastMessage.role !== 'user') return;
 
-    const response = await sendMessage(lastMessage.content);
+    // Pass the current sessionId (if any) to continue the chat
+    const response = await sendMessage(lastMessage.content, sessionId || undefined);
+
+    // If we didn't have a session ID before, and the response has one, it's a new session
+    if (!sessionId && response.id) {
+      onSessionCreated(response.id, originalInput);
+    }
 
     // The backend returns the full session history, but for now we just want to append the new assistant message
     // We can assume the last message in the returned history is the assistant's response
     const assistantResponse = response.messages[response.messages.length - 1];
 
     if (assistantResponse && assistantResponse.role === 'assistant') {
-      setMessages(prev => [...prev, { role: 'assistant', content: assistantResponse.content }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: assistantResponse.content, timestamp: assistantResponse.timestamp }]);
     }
   };
 
@@ -82,7 +81,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSend, 
             {messages.map((msg, index) => {
               // Skip rendering tool messages and assistant messages that ONLY have tool calls (no content)
               if (msg.role === 'tool') return null;
-              if (msg.role === 'assistant' && !msg.content && msg.tool_calls) return null;
+              if (msg.role === 'assistant' && !msg.content && msg.toolCalls) return null;
 
               return (
                 <div key={index} className={`message-row ${msg.role}`}>
