@@ -1,8 +1,10 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import MessageInput from './MessageInput';
 import { sendMessage, Message, ToolCall } from '../services/agentClient';
 import { getWidgetForTool } from './WidgetRegistry';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatAreaProps {
   messages: Message[];
@@ -29,7 +31,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    const userMessage: Message = { role: 'user', content: inputValue, timestamp: Date.now() / 1000 };
+    const userMessage: Message = { role: 'user', content: inputValue, timestamp: Date.now() };
     const newMessages = [...messages, userMessage];
 
     setMessages(newMessages);
@@ -61,136 +63,26 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
       onSessionCreated(response.id, originalInput);
     }
 
-    // The backend returns the full session history, but for now we just want to append the new assistant message
-    // We can assume the last message in the returned history is the assistant's response
-    const assistantResponse = response.messages[response.messages.length - 1];
+    // The backend returns the full session history.
+    // We need to find which messages are "new" (i.e., added after our last known message)
+    // and append ALL of them to our local state.
+    console.log("🔍 FULL BACKEND HISTORY:", JSON.stringify(response.messages, null, 2));
 
-    if (assistantResponse && assistantResponse.role === 'assistant') {
-      setMessages(prev => [...prev, assistantResponse]);
+    const lastKnownTimestamp = currentMessages[currentMessages.length - 1]?.timestamp || 0;
+
+    const newMessages = response.messages.filter(msg => {
+      // Filter out messages we already have based on timestamp
+      // Also filter out 'user' messages because we already added the user message optimistically
+      return (msg.timestamp || 0) > lastKnownTimestamp && msg.role !== 'user';
+    });
+
+    if (newMessages.length > 0) {
+      setMessages(prev => [...prev, ...newMessages]);
     }
-  };
-
-  const handleTestWidget = () => {
-    const mockData = {
-      "schema_version": "1.0",
-      "widget_type": "polymarket_instrument_chart",
-      "instrument": {
-        "entity_type": "event",
-        "id": "0x123...",
-        "slug": "us-election-2024",
-        "title": "Who will win the 2024 US Election?",
-        "url": "https://polymarket.com/event/us-election-2024",
-        "category": "Politics",
-        "tags": ["US", "Election"],
-        "status": "open",
-        "created_at": "2024-01-01T00:00:00Z",
-        "end_time": "2024-11-05T00:00:00Z",
-        "resolution": {
-          "resolved": false,
-          "resolution_time": null,
-          "winning_outcome_id": null,
-          "source": null
-        },
-        "metrics": {
-          "base_currency": "USDC",
-          "total_volume_usd": 15000000,
-          "open_interest_usd": 5000000,
-          "liquidity_usd": 2500000,
-          "num_traders": 12000
-        }
-      },
-      "chart": {
-        "granularity": "1d",
-        "from": "2024-11-01T00:00:00Z",
-        "to": "2024-11-29T12:00:00Z",
-        "timezone": "UTC"
-      },
-      "outcomes": [
-        {
-          "outcome_id": "outcome-1",
-          "label": "Trump",
-          "token_address": "0x...",
-          "color_hint": 1, // Red
-          "current_price": 0.52,
-          "current_probability": 0.52,
-          "price_24h_ago": 0.50,
-          "price_24h_change_abs": 0.02,
-          "price_24h_change_pct": 4.00,
-          "volume_24h_usd": 500000,
-          "is_winner": false,
-          "is_tradable": true
-        },
-        {
-          "outcome_id": "outcome-2",
-          "label": "Harris",
-          "token_address": "0x...",
-          "color_hint": 2, // Blue
-          "current_price": 0.47,
-          "current_probability": 0.47,
-          "price_24h_ago": 0.48,
-          "price_24h_change_abs": -0.01,
-          "price_24h_change_pct": -2.08,
-          "volume_24h_usd": 450000,
-          "is_winner": false,
-          "is_tradable": true
-        }
-      ],
-      "series": [
-        {
-          "outcome_id": "outcome-1",
-          "points": [
-            { "t": 1732800000000, "p": 0.51, "v": 1000 },
-            { "t": 1732810000000, "p": 0.52, "v": 1200 }
-          ]
-        },
-        {
-          "outcome_id": "outcome-2",
-          "points": [
-            { "t": 1732800000000, "p": 0.48, "v": 900 },
-            { "t": 1732810000000, "p": 0.47, "v": 850 }
-          ]
-        }
-      ]
-    };
-
-    const mockToolCall: ToolCall = {
-      id: 'call_123',
-      type: 'function',
-      function: {
-        name: 'render_polymarket_widget',
-        arguments: JSON.stringify(mockData)
-      }
-    };
-
-    const mockMessage: Message = {
-      role: 'assistant',
-      content: "Here is the market data you requested:",
-      toolCalls: [mockToolCall],
-      timestamp: Date.now() / 1000
-    };
-    setMessages(prev => [...prev, mockMessage]);
   };
 
   return (
     <main className="chat-area">
-      <button
-        onClick={handleTestWidget}
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 100,
-          padding: '8px 16px',
-          background: 'rgba(0, 0, 0, 0.5)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '8px',
-          color: 'white',
-          cursor: 'pointer',
-          backdropFilter: 'blur(10px)'
-        }}
-      >
-        Test Widget
-      </button>
       {messages.length > 0 ? (
         <div className="chat-container">
           <div className="messages-list">
@@ -224,10 +116,14 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
                     </div>
                   ) : msg.role === 'assistant' ? (
                     <div className="message-content">
-                      <div className="sender-name">Orecce</div>
+
 
                       {/* Render Text Content if present */}
-                      {msg.content && <div className="message-text">{msg.content}</div>}
+                      {msg.content && (
+                        <div className="message-text">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      )}
 
                       {/* Render Widgets if present */}
                       {widgets.length > 0 && (
@@ -243,7 +139,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
             {isLoading && (
               <div className="message-row assistant">
                 <div className="message-content">
-                  <div className="sender-name">Orecce</div>
+
                   <div className="message-text">Thinking...</div>
                 </div>
               </div>
@@ -292,8 +188,6 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           gap: var(--spacing-xl);
         }
 
-
-
         .input-area-sticky {
           padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
           padding-right: calc(var(--spacing-md) + 8px); /* Compensate for 8px scrollbar to align centers */
@@ -329,7 +223,6 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           background: linear-gradient(to bottom, transparent, var(--bg-primary));
           pointer-events: none; /* Let clicks pass through */
         }
-
 
         .message-row {
           display: flex;
@@ -385,11 +278,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           overflow-x: hidden; /* Ensure content doesn't overflow */
         }
 
-        .sender-name {
-          font-weight: 600;
-          font-size: 0.9rem;
-          color: var(--text-primary);
-        }
+
 
         .message-text {
           font-size: 1rem;
@@ -403,7 +292,6 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
 
         .message-row.assistant .message-text {
           color: var(--text-primary);
-          white-space: pre-wrap;
         }
 
         /* Ensure images don't overflow */
@@ -412,6 +300,18 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           height: auto;
           border-radius: var(--radius-md);
           margin-top: var(--spacing-sm);
+        }
+
+        .message-text :global(p) {
+          margin: 0 0 0.5em 0;
+        }
+        
+        .message-text :global(p:last-child) {
+          margin-bottom: 0;
+        }
+
+        .message-text :global(p:empty) {
+          display: none;
         }
 
         .widgets-list {
@@ -425,7 +325,6 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           width: 100%;
           max-width: 420px;
         }
-
       `}</style>
     </main>
   );

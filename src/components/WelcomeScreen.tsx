@@ -1,6 +1,7 @@
 import React from 'react';
 import MessageInput from './MessageInput';
 import Dashboard from './Dashboard';
+import { useAuth } from '@/context/AuthContext';
 
 interface WelcomeScreenProps {
   onSuggestionClick: (text: string) => void;
@@ -10,13 +11,13 @@ interface WelcomeScreenProps {
 }
 
 export default function WelcomeScreen({ onSuggestionClick, inputValue, onInputChange, onSend }: WelcomeScreenProps) {
+  const { user } = useAuth();
+  const displayName = user?.displayName?.split(' ')[0] || 'there';
+
   return (
     <div className="welcome-container">
       <div className="greeting-section">
-        <div className="icon-container">
-          <span className="sparkle-icon">✴</span>
-        </div>
-        <h1 className="greeting-text">Afternoon, Sulav Stern</h1>
+        <h1 className="greeting-text">Hey {displayName}!</h1>
       </div>
 
       <div className="input-section">
@@ -42,15 +43,6 @@ export default function WelcomeScreen({ onSuggestionClick, inputValue, onInputCh
           text-align: center;
           margin-bottom: var(--spacing-xl);
           margin-top: var(--spacing-xl);
-        }
-
-        .icon-container {
-          margin-bottom: var(--spacing-md);
-        }
-
-        .sparkle-icon {
-          font-size: 2rem;
-          color: var(--accent-primary);
         }
 
         .greeting-text {

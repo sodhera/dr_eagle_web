@@ -148,11 +148,21 @@ const formatCurrency = (value: number) => {
     }).format(value);
 };
 
-const formatNumber = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-        notation: "compact",
-        maximumFractionDigits: 1
-    }).format(value);
+const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toFixed(0);
+};
+
+const formatPercentage = (probability: number) => {
+    const percentage = probability * 100;
+    if (percentage === 0) return "0%";
+    if (percentage < 1) return percentage.toFixed(1) + "%";
+    return percentage.toFixed(0) + "%";
 };
 
 // --- Main Component ---
@@ -161,8 +171,8 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
     const { instrument, outcomes, series } = data;
     const [isBookmarked, setIsBookmarked] = useState(false);
 
-    // Use the first outcome as the primary one for the hero section
-    const primaryOutcome = outcomes[0];
+    // Use the outcome with the highest probability as the primary one
+    const primaryOutcome = [...outcomes].sort((a, b) => b.current_probability - a.current_probability)[0] || outcomes[0];
 
     // Flatten data for the chart
     const chartDataMap = new Map<number, any>();
@@ -179,7 +189,16 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
         });
     });
 
-    const chartData = Array.from(chartDataMap.values()).sort((a, b) => a.time - b.time);
+    let chartData = Array.from(chartDataMap.values()).sort((a, b) => a.time - b.time);
+
+    // FIX: If there is only 1 data point, AreaChart won't render anything.
+    // We duplicate the point to create a flat line across the view.
+    if (chartData.length === 1) {
+        const singlePoint = chartData[0];
+        // Create a fake "start" point 24 hours before
+        const startPoint = { ...singlePoint, time: singlePoint.time - (24 * 60 * 60 * 1000) };
+        chartData = [startPoint, singlePoint];
+    }
 
     const formatXAxis = (tickItem: number) => {
         const date = new Date(tickItem);
@@ -205,8 +224,11 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
 
             {/* Price Hero */}
             <div className="price-hero">
+                <div className="big-price-label" style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: 500 }}>
+                    {primaryOutcome.label}
+                </div>
                 <div className="big-price">
-                    {formatCurrency(primaryOutcome.current_price)}
+                    {formatPercentage(primaryOutcome.current_probability)}
                 </div>
                 <div className="price-change-badge">
                     <PercentageChange value={primaryOutcome.price_24h_change_pct} />
@@ -282,7 +304,7 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
                                 </div>
                             </div>
                             <div className="outcome-price" style={{ color: getColor(outcome.color_hint) }}>
-                                {(outcome.current_probability * 100).toFixed(0)}%
+                                {formatPercentage(outcome.current_probability)}
                             </div>
                         </div>
                     ))}
@@ -404,8 +426,9 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
 
         .price-hero {
           display: flex;
-          align-items: baseline;
-          gap: 12px;
+          flex-direction: column; /* Stack label and price */
+          align-items: flex-start;
+          gap: 4px;
           margin-bottom: 20px;
         }
 
@@ -454,6 +477,25 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
           display: flex;
           flex-direction: column;
           gap: 10px;
+          max-height: 240px;
+          overflow-y: auto;
+          padding-right: 8px;
+        }
+
+        /* Custom Scrollbar for outcomes list */
+        .outcomes-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .outcomes-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+        .outcomes-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        .outcomes-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .outcome-row {
