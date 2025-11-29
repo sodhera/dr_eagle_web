@@ -99,7 +99,7 @@ export async function renameSession(sessionId: string, title: string): Promise<v
     // Assuming the backend accepts a PATCH request with the new title
     // If the backend doesn't support 'title' directly, we might need to adjust this.
     // Based on the plan, we proceed with this assumption.
-    const response = await fetch(`${AGENT_BASE_URL}/agent/sessions/${sessionId}`, {
+    const response = await fetch(`${AGENT_BASE_URL}/agent/chat/${sessionId}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export async function renameSession(sessionId: string, title: string): Promise<v
 export async function deleteSession(sessionId: string): Promise<void> {
     const token = await getMcpToken();
 
-    const response = await fetch(`${AGENT_BASE_URL}/agent/sessions/${sessionId}`, {
+    const response = await fetch(`${AGENT_BASE_URL}/agent/chat/${sessionId}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${token}`

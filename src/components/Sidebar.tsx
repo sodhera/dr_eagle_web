@@ -22,6 +22,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, chatId: string | null }>({ isOpen: false, chatId: null });
   const settingsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -88,19 +89,25 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
     }
   };
 
-  const handleDeleteChat = async (e: React.MouseEvent, chatId: string) => {
+  const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
     e.stopPropagation();
-    if (!confirm("Are you sure you want to delete this chat?")) return;
+    setDeleteConfirmation({ isOpen: true, chatId });
+    setMenuOpenId(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmation.chatId) return;
 
     try {
-      await deleteSession(chatId);
-      setChats(chats.filter(c => c.id !== chatId));
-      setMenuOpenId(null);
-      if (currentSessionId === chatId) {
+      await deleteSession(deleteConfirmation.chatId);
+      setChats(chats.filter(c => c.id !== deleteConfirmation.chatId));
+      if (currentSessionId === deleteConfirmation.chatId) {
         onNewChat();
       }
     } catch (error) {
       console.error("Failed to delete chat:", error);
+    } finally {
+      setDeleteConfirmation({ isOpen: false, chatId: null });
     }
   };
 
@@ -112,20 +119,6 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-  };
-
-  const formatDate = (timestamp: number) => {
-    // Check if timestamp is in seconds (10 digits) or milliseconds (13 digits)
-    // If it's likely seconds (less than year 3000 in seconds), multiply by 1000
-    const date = new Date(timestamp < 10000000000 ? timestamp * 1000 : timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
-    return date.toLocaleDateString();
   };
 
   // Helper to get a title from messages if not explicit (though backend might provide title later, for now we infer or use first message)
@@ -148,14 +141,23 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         </svg>
       </button>
       <div className="sidebar-header">
-        <button className="new-chat-btn" aria-label="New Chat" onClick={onNewChat}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+        <span className="sidebar-brand" onClick={() => router.push('/')}>Orecce</span>
       </div>
 
       <div className="sidebar-content">
+        <button className="new-chat-full-btn" onClick={onNewChat}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="new-chat-icon">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          New Chat
+        </button>
+        <button className="edit-memory-btn" onClick={() => router.push('/edit-memory')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Edit Memory
+        </button>
         <div className="section-title">Your chats</div>
         <ul className="chat-list">
           {chats.map(chat => (
@@ -179,7 +181,6 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
                 <>
                   <div className="chat-item-content">
                     <span className="chat-title">{getChatTitle(chat)}</span>
-                    <span className="chat-date">{formatDate(chat.createdAt)}</span>
                   </div>
                   <div className="chat-options">
                     <button
@@ -254,6 +255,29 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         )}
       </div>
 
+      {deleteConfirmation.isOpen && (
+        <div className="modal-overlay" onClick={() => setDeleteConfirmation({ isOpen: false, chatId: null })}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Delete Chat?</h3>
+            <p>Are you sure you want to delete this chat? This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button
+                className="modal-btn cancel"
+                onClick={() => setDeleteConfirmation({ isOpen: false, chatId: null })}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-btn delete"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .sidebar {
           width: 260px;
@@ -267,6 +291,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           overflow: visible; /* Allow popup to overflow */
           flex-shrink: 0;
           position: relative;
+          padding-bottom: 80px; /* Space for absolute user profile */
         }
 
         .sidebar.closed {
@@ -275,17 +300,27 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         }
 
         .sidebar-header {
-          padding: var(--spacing-md);
+          height: 60px; /* Reserve space for the top area */
+          flex-shrink: 0;
           display: flex;
-          justify-content: flex-end; /* Align new chat to right or just push it? */
-          /* Actually, if toggle is left, new chat should be next to it? Or far right? */
-          /* ChatGPT has toggle left, new chat right next to it. */
-          /* Let's use margin-left on the button or just padding-left on header. */
-          padding-left: 60px; /* Space for fixed toggle (16px + 32px + gap) */
           align-items: center;
-          min-width: 260px; /* Prevent content squishing during transition */
+          padding: 0 var(--spacing-md);
           opacity: 1;
           transition: opacity 0.2s;
+          position: relative;
+        }
+
+        .sidebar-brand {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          letter-spacing: -0.02em;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+
+        .sidebar-brand:hover {
+          opacity: 0.8;
         }
 
         .sidebar.closed .sidebar-header {
@@ -293,33 +328,60 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           pointer-events: none;
         }
 
-        .new-chat-btn {
-          background: var(--accent-primary);
-          color: white;
+        .new-chat-full-btn {
+          background: transparent;
+          color: var(--text-primary);
           border: none;
           border-radius: var(--radius-sm);
-          width: 32px;
-          height: 32px;
+          width: 100%;
+          height: 40px;
           display: flex;
           align-items: center;
-          justify-content: center;
+          gap: 12px;
+          padding: 0 12px;
           cursor: pointer;
           transition: background 0.2s;
           outline: none;
+          margin-bottom: 2px; /* Match chat item spacing */
+          font-size: 0.9rem;
+          font-weight: 500;
         }
 
-        .new-chat-btn:focus {
+        .new-chat-icon {
+          color: var(--accent-primary);
+        }
+
+        .new-chat-full-btn:hover {
+          background: var(--bg-tertiary);
+        }
+
+        .edit-memory-btn {
+          background: transparent;
+          color: var(--text-primary);
+          border: none;
+          border-radius: var(--radius-sm);
+          width: 100%;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 0 12px;
+          cursor: pointer;
+          transition: all 0.2s;
           outline: none;
+          margin-bottom: 2px; /* Match chat item spacing */
+          font-size: 0.9rem;
+          font-weight: 500;
         }
 
-        .new-chat-btn:hover {
-          background: var(--accent-hover);
+        .edit-memory-btn:hover {
+          background: var(--bg-tertiary);
         }
 
         .sidebar-toggle {
-          position: fixed;
+          position: absolute;
           top: var(--spacing-md);
-          left: var(--spacing-md);
+          right: var(--spacing-md); /* Top right when open */
           z-index: 20;
           background: transparent;
           border: none;
@@ -332,8 +394,14 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: background-color 0.2s, color 0.2s;
+          transition: background-color 0.2s, color 0.2s, right 0.3s ease, left 0.3s ease;
           outline: none;
+        }
+
+        .sidebar.closed .sidebar-toggle {
+          right: auto;
+          left: var(--spacing-md); /* Top left when closed */
+          position: fixed; /* Keep it fixed on screen when closed */
         }
 
         .sidebar-toggle:focus {
@@ -348,9 +416,15 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         .sidebar-content {
           flex: 1;
           overflow-y: auto;
-          padding: var(--spacing-md);
           min-width: 260px;
-          margin-top: 40px; /* Add margin for fixed toggle */
+          padding: 0 var(--spacing-xs); /* Small side padding */
+          transition: opacity 0.2s;
+        }
+
+        .sidebar.closed .sidebar-content {
+          opacity: 0;
+          pointer-events: none;
+          visibility: hidden;
         }
 
         .section-title {
@@ -359,33 +433,43 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           letter-spacing: 0.05em;
           margin-bottom: var(--spacing-sm);
           opacity: 0.7;
+          padding: var(--spacing-md) var(--spacing-sm) 0 var(--spacing-sm); /* Align with items */
         }
 
         .chat-list {
           list-style: none;
+          padding: 0;
+          margin: 0;
         }
 
         .chat-item {
           padding: var(--spacing-sm) var(--spacing-md);
-          margin: 0 -var(--spacing-md);
           cursor: pointer;
           display: flex;
           justify-content: space-between;
           align-items: center;
           font-size: 0.9rem;
           color: var(--text-primary);
-          border-radius: var(--radius-sm);
           position: relative;
           group: true; /* Enable group hover */
+          height: 40px; /* Fixed height for consistency */
+          border-radius: var(--radius-sm); /* Restore rounded corners */
+          margin-bottom: 2px; /* Small gap between items */
         }
 
         .chat-item-content {
           flex: 1;
           display: flex;
-          justify-content: space-between;
           align-items: center;
           overflow: hidden;
           padding-right: 8px;
+        }
+        
+        .chat-title {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 100%;
         }
 
         .chat-options {
@@ -478,34 +562,34 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           background-color: var(--bg-tertiary);
         }
 
-        .chat-date {
-          font-size: 0.75rem;
-          opacity: 0.5;
-        }
-
         .sidebar-footer {
           /* Removed padding/border as profile is now fixed */
         }
 
         .user-profile {
-          position: fixed;
-          bottom: var(--spacing-md);
-          left: var(--spacing-md);
-          z-index: 20;
           display: flex;
           align-items: center;
           gap: var(--spacing-sm);
           cursor: pointer;
-          padding: var(--spacing-xs);
-          border-radius: var(--radius-sm);
+          padding: var(--spacing-md);
+          border-top: 1px solid var(--border-subtle);
           transition: all 0.3s ease;
-          width: calc(260px - var(--spacing-md) * 2); /* Full width minus margins */
-          background-color: transparent;
+          width: 100%;
+          background-color: var(--bg-secondary);
+          z-index: 20;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          white-space: nowrap;
         }
 
         .sidebar.closed .user-profile {
+          bottom: var(--spacing-md);
+          left: var(--spacing-md);
           width: 40px; /* Just avatar width + padding */
           background-color: transparent;
+          border-top: none;
+          padding: 0;
         }
 
         .user-profile:hover {
@@ -553,7 +637,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         .settings-popup {
           position: absolute;
           bottom: 100%;
-          left: 0; /* Align with profile */
+          left: var(--spacing-md); /* Align with profile padding */
           width: 200px;
           background-color: var(--bg-secondary);
           border: 1px solid var(--border-subtle);
@@ -562,6 +646,10 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
           padding: var(--spacing-xs);
           z-index: 100;
           margin-bottom: var(--spacing-xs);
+        }
+
+        .sidebar.closed .settings-popup {
+          left: 0; /* Align with floating avatar */
         }
 
         .popup-item {
@@ -592,6 +680,83 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
 
         .popup-item.logout:hover {
           background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+          background-color: var(--bg-secondary);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--radius-md);
+          padding: var(--spacing-lg);
+          width: 320px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content h3 {
+          margin-top: 0;
+          margin-bottom: var(--spacing-sm);
+          color: var(--text-primary);
+          font-size: 1.1rem;
+        }
+
+        .modal-content p {
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+          margin-bottom: var(--spacing-lg);
+          line-height: 1.5;
+        }
+
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: var(--spacing-sm);
+        }
+
+        .modal-btn {
+          padding: 8px 16px;
+          border-radius: var(--radius-sm);
+          font-size: 0.9rem;
+          cursor: pointer;
+          border: none;
+          transition: background-color 0.2s;
+          font-weight: 500;
+        }
+
+        .modal-btn.cancel {
+          background-color: var(--bg-tertiary);
+          color: var(--text-primary);
+        }
+
+        .modal-btn.cancel:hover {
+          background-color: var(--bg-hover, #333); /* Fallback if var not defined */
+        }
+
+        .modal-btn.delete {
+          background-color: #ff6b6b;
+          color: white;
+        }
+
+        .modal-btn.delete:hover {
+          background-color: #ff5252;
         }
       `}</style>
     </aside>

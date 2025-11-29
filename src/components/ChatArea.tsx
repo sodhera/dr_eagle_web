@@ -140,7 +140,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
               <div className="message-row assistant">
                 <div className="message-content">
 
-                  <div className="message-text">Thinking...</div>
+                  <div className="message-text">Thinking<span className="thinking-dots"></span></div>
                 </div>
               </div>
             )}
@@ -324,6 +324,21 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
         .widget-container {
           width: 100%;
           max-width: 420px;
+        }
+
+        .thinking-dots::after {
+          content: '.';
+          animation: dots 1.5s steps(1, end) infinite;
+          display: inline-block;
+          width: 1.2em;
+          text-align: left;
+        }
+
+        @keyframes dots {
+          0% { content: ''; }
+          25% { content: '.'; }
+          50% { content: '..'; }
+          75% { content: '...'; }
         }
       `}</style>
     </main>
