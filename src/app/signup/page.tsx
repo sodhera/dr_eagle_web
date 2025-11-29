@@ -76,7 +76,7 @@ export default function SignupPage() {
                 </div>
 
                 <h1 className={styles.title}>Create an account</h1>
-                <p className={styles.subtitle}>Start your journey with DrEagle today</p>
+                <p className={styles.subtitle}>Start your journey with Orecce today</p>
 
                 {error && <p style={{ color: '#ff6b6b', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</p>}
 

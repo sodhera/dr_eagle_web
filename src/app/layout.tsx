@@ -17,7 +17,7 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "DrEagle",
+  title: "Orecce",
   description: "AI Assistant",
 };
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import MessageInput from './MessageInput';
-import { sendMessage, Message } from '../services/agentClient';
+import { sendMessage, Message, ToolCall } from '../services/agentClient';
+import { getWidgetForTool } from './WidgetRegistry';
 
 interface ChatAreaProps {
   messages: Message[];
@@ -51,6 +52,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
     const lastMessage = currentMessages[currentMessages.length - 1];
     if (lastMessage.role !== 'user') return;
 
+
     // Pass the current sessionId (if any) to continue the chat
     const response = await sendMessage(lastMessage.content, sessionId || undefined);
 
@@ -64,24 +66,152 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
     const assistantResponse = response.messages[response.messages.length - 1];
 
     if (assistantResponse && assistantResponse.role === 'assistant') {
-      setMessages(prev => [...prev, { role: 'assistant', content: assistantResponse.content, timestamp: assistantResponse.timestamp }]);
+      setMessages(prev => [...prev, assistantResponse]);
     }
   };
 
-  // Override the parent's onSend to use our local handleSend
-  // But wait, the parent passed onSend. We should probably update the parent to delegate to us 
-  // or we just ignore the parent's onSend and use our own logic since we control the state via setMessages.
-  // The prompt asked to "Update ChatArea.tsx", so I'm assuming I own the logic now.
+  const handleTestWidget = () => {
+    const mockData = {
+      "schema_version": "1.0",
+      "widget_type": "polymarket_instrument_chart",
+      "instrument": {
+        "entity_type": "event",
+        "id": "0x123...",
+        "slug": "us-election-2024",
+        "title": "Who will win the 2024 US Election?",
+        "url": "https://polymarket.com/event/us-election-2024",
+        "category": "Politics",
+        "tags": ["US", "Election"],
+        "status": "open",
+        "created_at": "2024-01-01T00:00:00Z",
+        "end_time": "2024-11-05T00:00:00Z",
+        "resolution": {
+          "resolved": false,
+          "resolution_time": null,
+          "winning_outcome_id": null,
+          "source": null
+        },
+        "metrics": {
+          "base_currency": "USDC",
+          "total_volume_usd": 15000000,
+          "open_interest_usd": 5000000,
+          "liquidity_usd": 2500000,
+          "num_traders": 12000
+        }
+      },
+      "chart": {
+        "granularity": "1d",
+        "from": "2024-11-01T00:00:00Z",
+        "to": "2024-11-29T12:00:00Z",
+        "timezone": "UTC"
+      },
+      "outcomes": [
+        {
+          "outcome_id": "outcome-1",
+          "label": "Trump",
+          "token_address": "0x...",
+          "color_hint": 1, // Red
+          "current_price": 0.52,
+          "current_probability": 0.52,
+          "price_24h_ago": 0.50,
+          "price_24h_change_abs": 0.02,
+          "price_24h_change_pct": 4.00,
+          "volume_24h_usd": 500000,
+          "is_winner": false,
+          "is_tradable": true
+        },
+        {
+          "outcome_id": "outcome-2",
+          "label": "Harris",
+          "token_address": "0x...",
+          "color_hint": 2, // Blue
+          "current_price": 0.47,
+          "current_probability": 0.47,
+          "price_24h_ago": 0.48,
+          "price_24h_change_abs": -0.01,
+          "price_24h_change_pct": -2.08,
+          "volume_24h_usd": 450000,
+          "is_winner": false,
+          "is_tradable": true
+        }
+      ],
+      "series": [
+        {
+          "outcome_id": "outcome-1",
+          "points": [
+            { "t": 1732800000000, "p": 0.51, "v": 1000 },
+            { "t": 1732810000000, "p": 0.52, "v": 1200 }
+          ]
+        },
+        {
+          "outcome_id": "outcome-2",
+          "points": [
+            { "t": 1732800000000, "p": 0.48, "v": 900 },
+            { "t": 1732810000000, "p": 0.47, "v": 850 }
+          ]
+        }
+      ]
+    };
+
+    const mockToolCall: ToolCall = {
+      id: 'call_123',
+      type: 'function',
+      function: {
+        name: 'render_polymarket_widget',
+        arguments: JSON.stringify(mockData)
+      }
+    };
+
+    const mockMessage: Message = {
+      role: 'assistant',
+      content: "Here is the market data you requested:",
+      toolCalls: [mockToolCall],
+      timestamp: Date.now() / 1000
+    };
+    setMessages(prev => [...prev, mockMessage]);
+  };
 
   return (
     <main className="chat-area">
+      <button
+        onClick={handleTestWidget}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 100,
+          padding: '8px 16px',
+          background: 'rgba(0, 0, 0, 0.5)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '8px',
+          color: 'white',
+          cursor: 'pointer',
+          backdropFilter: 'blur(10px)'
+        }}
+      >
+        Test Widget
+      </button>
       {messages.length > 0 ? (
         <div className="chat-container">
           <div className="messages-list">
             {messages.map((msg, index) => {
-              // Skip rendering tool messages and assistant messages that ONLY have tool calls (no content)
+              // Skip rendering tool messages (the output of tools)
               if (msg.role === 'tool') return null;
-              if (msg.role === 'assistant' && !msg.content && msg.toolCalls) return null;
+
+              // Render Tool Calls (Widgets)
+              const widgets: React.ReactNode[] = [];
+              if (msg.toolCalls && msg.toolCalls.length > 0) {
+                msg.toolCalls.forEach(toolCall => {
+                  const widget = getWidgetForTool(toolCall.function.name, toolCall.function.arguments);
+                  if (widget) {
+                    widgets.push(
+                      <div key={toolCall.id} className="widget-container">
+                        {widget}
+                      </div>
+                    );
+                  }
+                });
+              }
 
               return (
                 <div key={index} className={`message-row ${msg.role}`}>
@@ -94,8 +224,17 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
                     </div>
                   ) : msg.role === 'assistant' ? (
                     <div className="message-content">
-                      <div className="sender-name">DrEagle</div>
-                      <div className="message-text">{msg.content}</div>
+                      <div className="sender-name">Orecce</div>
+
+                      {/* Render Text Content if present */}
+                      {msg.content && <div className="message-text">{msg.content}</div>}
+
+                      {/* Render Widgets if present */}
+                      {widgets.length > 0 && (
+                        <div className="widgets-list">
+                          {widgets}
+                        </div>
+                      )}
                     </div>
                   ) : null}
                 </div>
@@ -104,7 +243,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
             {isLoading && (
               <div className="message-row assistant">
                 <div className="message-content">
-                  <div className="sender-name">DrEagle</div>
+                  <div className="sender-name">Orecce</div>
                   <div className="message-text">Thinking...</div>
                 </div>
               </div>
@@ -275,6 +414,17 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           margin-top: var(--spacing-sm);
         }
 
+        .widgets-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-top: 12px;
+        }
+
+        .widget-container {
+          width: 100%;
+          max-width: 420px;
+        }
 
       `}</style>
     </main>

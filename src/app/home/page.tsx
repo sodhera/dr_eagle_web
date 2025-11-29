@@ -19,7 +19,7 @@ export default function HomePage() {
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                             </svg>
                         </div>
-                        <span className="font-bold text-xl text-[var(--accent-primary)] font-serif italic">DrEagle</span>
+                        <span className="font-bold text-xl text-[var(--accent-primary)] font-serif italic">Orecce</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <button className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">

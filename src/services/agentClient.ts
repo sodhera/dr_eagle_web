@@ -28,6 +28,7 @@ export interface ChatSession {
     messages: Message[];
     customInstructions: string;
     widgets: Record<string, any>;
+    title?: string; // Optional title if backend supports it or we store it locally
 }
 
 // Alias for backward compatibility if needed, or just replace usages
@@ -90,4 +91,41 @@ export async function getUserSessions(limit: number = 20): Promise<ChatSession[]
     }
 
     return response.json();
+}
+
+export async function renameSession(sessionId: string, title: string): Promise<void> {
+    const token = await getMcpToken();
+
+    // Assuming the backend accepts a PATCH request with the new title
+    // If the backend doesn't support 'title' directly, we might need to adjust this.
+    // Based on the plan, we proceed with this assumption.
+    const response = await fetch(`${AGENT_BASE_URL}/agent/sessions/${sessionId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to rename session: ${response.status} ${errorText}`);
+    }
+}
+
+export async function deleteSession(sessionId: string): Promise<void> {
+    const token = await getMcpToken();
+
+    const response = await fetch(`${AGENT_BASE_URL}/agent/sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete session: ${response.status} ${errorText}`);
+    }
 }

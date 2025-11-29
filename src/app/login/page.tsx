@@ -71,7 +71,7 @@ export default function LoginPage() {
                     </svg>
                 </div>
 
-                <h1 className={styles.title}>Welcome to DrEagle</h1>
+                <h1 className={styles.title}>Welcome to Orecce</h1>
                 <p className={styles.subtitle}>Your Gateway to Intelligent Interaction</p>
 
                 {error && <p style={{ color: '#ff6b6b', marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
