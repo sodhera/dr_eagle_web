@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
+import Homepage from '@/components/Homepage';
 import { getChatHistory, Message } from '@/services/agentClient';
 
 export default function Home() {
@@ -16,22 +17,16 @@ export default function Home() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [refreshSidebarTrigger, setRefreshSidebarTrigger] = useState(0);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
-    }
-  }, [user, loading, router]);
-
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0a192f', color: 'white' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white', color: 'black' }}>
         Loading...
       </div>
     );
   }
 
   if (!user) {
-    return null; // Don't render anything while redirecting
+    return <Homepage />;
   }
 
   const handleToggleSidebar = () => {

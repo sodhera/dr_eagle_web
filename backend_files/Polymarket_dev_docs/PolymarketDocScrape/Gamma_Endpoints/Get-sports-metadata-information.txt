@@ -1,0 +1,82 @@
+URL: https://docs.polymarket.com/api-reference/sports/get-sports-metadata-information
+
+Sports
+Get sports metadata information
+Retrieves metadata for various sports including images, resolution sources, ordering preferences, tags, and series information. This endpoint provides comprehensive sport configuration data used throughout the platform.
+GET
+/
+sports
+Try it
+Get sports metadata information
+cURL
+Copy
+Ask AI
+curl
+--request
+GET
+\
+--url
+https://gamma-api.polymarket.com/sports
+200
+Copy
+Ask AI
+[
+{
+"sport"
+:
+"<string>"
+,
+"image"
+:
+"<string>"
+,
+"resolution"
+:
+"<string>"
+,
+"ordering"
+:
+"<string>"
+,
+"tags"
+:
+"<string>"
+,
+"series"
+:
+"<string>"
+}
+]
+Response
+200 - application/json
+List of sports metadata objects containing sport configuration details, visual assets, and related identifiers
+​
+sport
+string
+The sport identifier or abbreviation
+​
+image
+string<uri>
+URL to the sport's logo or image asset
+​
+resolution
+string<uri>
+URL to the official resolution source for the sport (e.g., league website)
+​
+ordering
+string
+Preferred ordering for sport display, typically "home" or "away"
+​
+tags
+string
+Comma-separated list of tag IDs associated with the sport for categorization and filtering
+​
+series
+string
+Series identifier linking the sport to a specific tournament or season series
+List teams
+List tags
+⌘
+I
+github
+Powered by Mintlify

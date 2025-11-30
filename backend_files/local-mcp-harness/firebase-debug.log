@@ -1,0 +1,174 @@
+[debug] [2025-11-28T07:17:22.601Z] ----------------------------------------------------------------------
+[debug] [2025-11-28T07:17:22.607Z] Command:       /Users/sirishjoshi/.nvm/versions/node/v20.19.0/bin/node /Users/sirishjoshi/.nvm/versions/node/v20.19.0/bin/firebase deploy --only functions
+[debug] [2025-11-28T07:17:22.607Z] CLI Version:   14.22.0
+[debug] [2025-11-28T07:17:22.607Z] Platform:      darwin
+[debug] [2025-11-28T07:17:22.607Z] Node Version:  v20.19.0
+[debug] [2025-11-28T07:17:22.607Z] Time:          Fri Nov 28 2025 11:17:22 GMT+0400 (Gulf Standard Time)
+[debug] [2025-11-28T07:17:22.607Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-28T07:17:22.705Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-28T07:17:22.706Z] > authorizing via signed-in user (admin@sodhera.com)
+[debug] [2025-11-28T07:17:22.706Z] [iam] checking project audit-3a7ec for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-11-28T07:17:22.707Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:22.707Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:22.707Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions [none]
+[debug] [2025-11-28T07:17:22.707Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions x-goog-quota-user=projects/audit-3a7ec
+[debug] [2025-11-28T07:17:22.707Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-11-28T07:17:24.163Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions 200
+[debug] [2025-11-28T07:17:24.163Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-11-28T07:17:24.163Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:24.163Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:24.163Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/audit-3a7ec/serviceAccounts/audit-3a7ec@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-11-28T07:17:24.163Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/audit-3a7ec/serviceAccounts/audit-3a7ec@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-11-28T07:17:25.598Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/audit-3a7ec/serviceAccounts/audit-3a7ec@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-11-28T07:17:25.599Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/audit-3a7ec/serviceAccounts/audit-3a7ec@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'audit-3a7ec'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-11-28T07:17:25.603Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:25.603Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:25.603Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec [none]
+[debug] [2025-11-28T07:17:25.911Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec 200
+[debug] [2025-11-28T07:17:25.911Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec {"projectNumber":"734175123527","projectId":"audit-3a7ec","lifecycleState":"ACTIVE","name":"audit","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-10-22T12:28:45.178119Z","parent":{"type":"organization","id":"446022440797"}}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-11-28T07:17:25.914Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:25.914Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:25.914Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/audit-3a7ec/adminSdkConfig [none]
+[debug] [2025-11-28T07:17:26.383Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/audit-3a7ec/adminSdkConfig 200
+[debug] [2025-11-28T07:17:26.383Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/audit-3a7ec/adminSdkConfig {"projectId":"audit-3a7ec","storageBucket":"audit-3a7ec.firebasestorage.app"}
+[debug] [2025-11-28T07:17:26.384Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:26.384Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:26.384Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs [none]
+[debug] [2025-11-28T07:17:26.956Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs 200
+[debug] [2025-11-28T07:17:26.956Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs {"configs":[{"name":"projects/audit-3a7ec/configs/resend"}]}
+[debug] [2025-11-28T07:17:26.956Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:26.956Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:26.956Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables [none]
+[debug] [2025-11-28T07:17:27.255Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables 200
+[debug] [2025-11-28T07:17:27.255Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables {"variables":[{"name":"projects/audit-3a7ec/configs/resend/variables/api_key","updateTime":"2025-11-20T13:53:59.458671147Z"}]}
+[debug] [2025-11-28T07:17:27.255Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:27.255Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:27.255Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables/api_key [none]
+[debug] [2025-11-28T07:17:27.556Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables/api_key 200
+[debug] [2025-11-28T07:17:27.556Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/audit-3a7ec/configs/resend/variables/api_key {"name":"projects/audit-3a7ec/configs/resend/variables/api_key","updateTime":"2025-11-20T13:53:59.458671147Z","text":"re_V3L2k8Nc_36CvuvFjaCT72tysRv6eou9m"}
+[debug] [2025-11-28T07:17:27.559Z] Validating nodejs source
+[debug] [2025-11-28T07:17:27.959Z] > [functions] package.json contents: {
+  "name": "tracking-agents-functions",
+  "version": "0.1.0",
+  "private": true,
+  "main": "lib/functions/src/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "echo \"No lint configured\"",
+    "predeploy": "npm run build"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "undici": "^5.28.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.4.0"
+  }
+}
+[debug] [2025-11-28T07:17:27.959Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-11-28T07:17:27.960Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-11-28T07:17:27.964Z] Found firebase-functions binary at '/Users/sirishjoshi/Desktop/DREAGLE-BACKEND/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8805
+
+[debug] [2025-11-28T07:17:28.279Z] Got response from /__/functions.yaml {"endpoints":{"polymarketReadMcp":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["us-central1"],"labels":{},"httpsTrigger":{},"entryPoint":"polymarketReadMcp"},"issueMcpToken":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":"audit-3a7ec@appspot.gserviceaccount.com","vpc":null,"platform":"gcfv2","region":["us-central1"],"labels":{},"httpsTrigger":{},"entryPoint":"issueMcpToken"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2025-11-28T07:17:32.297Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-28T07:17:32.297Z] > authorizing via signed-in user (admin@sodhera.com)
+[debug] [2025-11-28T07:17:32.297Z] [iam] checking project audit-3a7ec for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2025-11-28T07:17:32.298Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:32.298Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:32.298Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions [none]
+[debug] [2025-11-28T07:17:32.298Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions x-goog-quota-user=projects/audit-3a7ec
+[debug] [2025-11-28T07:17:32.298Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-11-28T07:17:33.691Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions 200
+[debug] [2025-11-28T07:17:33.691Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-11-28T07:17:33.692Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:33.692Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:33.693Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/audit-3a7ec/instances pageSize=100&pageToken=
+[debug] [2025-11-28T07:17:35.210Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/audit-3a7ec/instances 200
+[debug] [2025-11-28T07:17:35.211Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/audit-3a7ec/instances {}
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged /Users/sirishjoshi/Desktop/DREAGLE-BACKEND/functions (99.98 KB) for uploading 
+[debug] [2025-11-28T07:17:35.293Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:35.293Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:35.293Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/audit-3a7ec/locations/-/functions [none]
+[debug] [2025-11-28T07:17:36.076Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/audit-3a7ec/locations/-/functions 200
+[debug] [2025-11-28T07:17:36.076Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/audit-3a7ec/locations/-/functions {}
+[debug] [2025-11-28T07:17:36.077Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:36.077Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:36.077Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2025-11-28T07:17:37.140Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/-/functions 200
+[debug] [2025-11-28T07:17:37.141Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/-/functions {"functions":[{"name":"projects/audit-3a7ec/locations/us-central1/functions/issueMcpToken","buildConfig":{"build":"projects/734175123527/locations/us-central1/builds/40710ea1-ecab-4557-9d66-a611af1ea5d4","runtime":"nodejs20","entryPoint":"issueMcpToken","source":{"storageSource":{"bucket":"gcf-v2-sources-734175123527-us-central1","object":"issueMcpToken/function-source.zip","generation":"1764298496528217"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/audit-3a7ec/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-734175123527-us-central1","object":"issueMcpToken/function-source.zip","generation":"1764298496528217"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/audit-3a7ec/serviceAccounts/734175123527-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/audit-3a7ec/locations/us-central1/services/issuemcptoken","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"audit-3a7ec\",\"storageBucket\":\"audit-3a7ec.firebasestorage.app\"}","GCLOUD_PROJECT":"audit-3a7ec","EVENTARC_CLOUD_EVENT_SOURCE":"projects/audit-3a7ec/locations/us-central1/services/issueMcpToken","FUNCTION_TARGET":"issueMcpToken","LOG_EXECUTION_ID":"true","FUNCTION_SIGNATURE_TYPE":"http"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://issuemcptoken-2ljiuwaa3a-uc.a.run.app","serviceAccountEmail":"audit-3a7ec@appspot.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"issuemcptoken-00007-mel","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"state":"ACTIVE","updateTime":"2025-11-28T02:55:03.625234206Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"3472ff3147e6e1c244e22cd83517828d3a7752da"},"environment":"GEN_2","url":"https://us-central1-audit-3a7ec.cloudfunctions.net/issueMcpToken","createTime":"2025-11-26T15:48:26.189555327Z","satisfiesPzi":true},{"name":"projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp","buildConfig":{"build":"projects/734175123527/locations/us-central1/builds/9348b7e9-b6ec-4281-a2b6-bf8015a9866f","runtime":"nodejs20","entryPoint":"polymarketReadMcp","source":{"storageSource":{"bucket":"gcf-v2-sources-734175123527-us-central1","object":"polymarketReadMcp/function-source.zip","generation":"1764312388284575"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/audit-3a7ec/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-734175123527-us-central1","object":"polymarketReadMcp/function-source.zip","generation":"1764312388284575"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/audit-3a7ec/serviceAccounts/734175123527-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/audit-3a7ec/locations/us-central1/services/polymarketreadmcp","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"audit-3a7ec\",\"storageBucket\":\"audit-3a7ec.firebasestorage.app\"}","GCLOUD_PROJECT":"audit-3a7ec","EVENTARC_CLOUD_EVENT_SOURCE":"projects/audit-3a7ec/locations/us-central1/services/polymarketReadMcp","FUNCTION_TARGET":"polymarketReadMcp","LOG_EXECUTION_ID":"true","FUNCTION_SIGNATURE_TYPE":"http"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://polymarketreadmcp-2ljiuwaa3a-uc.a.run.app","serviceAccountEmail":"734175123527-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"secretEnvironmentVariables":[{"key":"POLYMARKET_API_KEY","secret":"POLYMARKET_API_KEY","version":"latest"},{"key":"POLYMARKET_PASSPHRASE","secret":"POLYMARKET_PASSPHRASE","version":"latest"},{"key":"POLYMARKET_SECRET","secret":"POLYMARKET_SECRET","version":"latest"}],"revision":"polymarketreadmcp-00030-yof","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"state":"ACTIVE","updateTime":"2025-11-28T06:47:14.443874324Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"06aa4789e51cb753e1c7b2f6b70090b93a6ead55"},"environment":"GEN_2","url":"https://us-central1-audit-3a7ec.cloudfunctions.net/polymarketReadMcp","createTime":"2025-11-26T13:16:51.626485515Z","satisfiesPzi":true}]}
+[info] i  functions: ensuring required API run.googleapis.com is enabled... 
+[info] i  functions: ensuring required API eventarc.googleapis.com is enabled... 
+[info] i  functions: ensuring required API pubsub.googleapis.com is enabled... 
+[info] i  functions: ensuring required API storage.googleapis.com is enabled... 
+[info] i  functions: generating the service identity for pubsub.googleapis.com... 
+[debug] [2025-11-28T07:17:37.145Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:37.145Z] Checked if tokens are valid: true, expires at: 1764317586852
+[info] i  functions: generating the service identity for eventarc.googleapis.com... 
+[debug] [2025-11-28T07:17:37.145Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:37.145Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:37.145Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/pubsub.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-11-28T07:17:37.145Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/pubsub.googleapis.com:generateServiceIdentity x-goog-quota-user=projects/734175123527
+[debug] [2025-11-28T07:17:37.145Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/pubsub.googleapis.com:generateServiceIdentity {}
+[debug] [2025-11-28T07:17:37.146Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/eventarc.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-11-28T07:17:37.146Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/eventarc.googleapis.com:generateServiceIdentity x-goog-quota-user=projects/734175123527
+[debug] [2025-11-28T07:17:37.146Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/eventarc.googleapis.com:generateServiceIdentity {}
+[debug] [2025-11-28T07:17:38.758Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/pubsub.googleapis.com:generateServiceIdentity 200
+[debug] [2025-11-28T07:17:38.758Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/pubsub.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-734175123527@gcp-sa-pubsub.iam.gserviceaccount.com","uniqueId":"101881977946499000373"}}
+[debug] [2025-11-28T07:17:38.807Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/eventarc.googleapis.com:generateServiceIdentity 200
+[debug] [2025-11-28T07:17:38.808Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/734175123527/services/eventarc.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-734175123527@gcp-sa-eventarc.iam.gserviceaccount.com","uniqueId":"117384452430378552527"}}
+[debug] [2025-11-28T07:17:38.812Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:38.812Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:38.812Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec [none]
+[debug] [2025-11-28T07:17:40.245Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec 200
+[debug] [2025-11-28T07:17:40.246Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/audit-3a7ec {"projectNumber":"734175123527","projectId":"audit-3a7ec","lifecycleState":"ACTIVE","name":"audit","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-10-22T12:28:45.178119Z","parent":{"type":"organization","id":"446022440797"}}
+[debug] [2025-11-28T07:17:40.247Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:40.247Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:40.247Z] >>> [apiv2][query] GET https://compute.googleapis.com/compute/v1/projects/734175123527 [none]
+[debug] [2025-11-28T07:17:40.742Z] <<< [apiv2][status] GET https://compute.googleapis.com/compute/v1/projects/734175123527 403
+[debug] [2025-11-28T07:17:40.742Z] <<< [apiv2][body] GET https://compute.googleapis.com/compute/v1/projects/734175123527 {"error":{"code":403,"message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"734175123527","consumer":"projects/734175123527","serviceTitle":"Compute Engine API","service":"compute.googleapis.com","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527"}]}]}}
+[debug] [2025-11-28T07:17:40.743Z] unable to look up default compute service account. Falling back to 734175123527-compute@developer.gserviceaccount.com. Error: {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":403,"message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"734175123527","consumer":"projects/734175123527","serviceTitle":"Compute Engine API","service":"compute.googleapis.com","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527"}]}]}},"response":{"statusCode":403}},"exit":1,"message":"Request to https://compute.googleapis.com/compute/v1/projects/734175123527 had HTTP Error: 403, Compute Engine API has not been used in project 734175123527 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=734175123527 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":403}
+[debug] [2025-11-28T07:17:40.744Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:40.744Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:40.744Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/audit-3a7ec/billingInfo [none]
+[debug] [2025-11-28T07:17:41.680Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/audit-3a7ec/billingInfo 200
+[debug] [2025-11-28T07:17:41.680Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/audit-3a7ec/billingInfo {"name":"projects/audit-3a7ec/billingInfo","projectId":"audit-3a7ec","billingAccountName":"billingAccounts/015C99-A53059-EF2C38","billingEnabled":true}
+[debug] [2025-11-28T07:17:41.682Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:41.682Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:41.682Z] >>> [apiv2][query] POST https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions:generateUploadUrl [none]
+[debug] [2025-11-28T07:17:42.545Z] <<< [apiv2][status] POST https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions:generateUploadUrl 200
+[debug] [2025-11-28T07:17:42.545Z] <<< [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions:generateUploadUrl {"uploadUrl":"https://storage.googleapis.com/gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com/6bf8628e-9d52-4345-b75c-558a66a95d4c.zip?GoogleAccessId=service-734175123527@gcf-admin-robot.iam.gserviceaccount.com&Expires=1764316062&Signature=KpgU7KxkII6Wsor8rSbbyptawzSkAr2jqSKM1Bl3mSnXGh%2BdJDgswgRUwb3%2FrFXs5aUiEkYK%2B79DRuutnsofNxgSiJudE2krutw3tDhQiu0GyoHpmJ6ENFLdCB%2F4NWRnhbhiSQjJAcKkGCV8xDDeIUqos7mH1Seh3jxJmssk7lhXVZErKxYDFtWLSfjOVfx6dZgLxNYeuqjqttVeoeIPuyEZFAZLZxa4YsAFq9wdMT0%2BOXziwWuPyHiwZWq6bFIuokBLYQV%2BYSSliSKZXgtOZAD7GYzW0t5gLdat52g0t84bfAULXBDRvRgoy22nTb4h8yvVC7Fji%2Fn9TzZnaIoLLQ%3D%3D","storageSource":{"bucket":"gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com","object":"6bf8628e-9d52-4345-b75c-558a66a95d4c.zip"}}
+[debug] [2025-11-28T07:17:42.547Z] >>> [apiv2][query] PUT https://storage.googleapis.com/gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com/6bf8628e-9d52-4345-b75c-558a66a95d4c.zip GoogleAccessId=service-734175123527%40gcf-admin-robot.iam.gserviceaccount.com&Expires=1764316062&Signature=KpgU7KxkII6Wsor8rSbbyptawzSkAr2jqSKM1Bl3mSnXGh%2BdJDgswgRUwb3%2FrFXs5aUiEkYK%2B79DRuutnsofNxgSiJudE2krutw3tDhQiu0GyoHpmJ6ENFLdCB%2F4NWRnhbhiSQjJAcKkGCV8xDDeIUqos7mH1Seh3jxJmssk7lhXVZErKxYDFtWLSfjOVfx6dZgLxNYeuqjqttVeoeIPuyEZFAZLZxa4YsAFq9wdMT0%2BOXziwWuPyHiwZWq6bFIuokBLYQV%2BYSSliSKZXgtOZAD7GYzW0t5gLdat52g0t84bfAULXBDRvRgoy22nTb4h8yvVC7Fji%2Fn9TzZnaIoLLQ%3D%3D
+[debug] [2025-11-28T07:17:42.547Z] >>> [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com/6bf8628e-9d52-4345-b75c-558a66a95d4c.zip [stream]
+[debug] [2025-11-28T07:17:44.782Z] <<< [apiv2][status] PUT https://storage.googleapis.com/gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com/6bf8628e-9d52-4345-b75c-558a66a95d4c.zip 200
+[debug] [2025-11-28T07:17:44.783Z] <<< [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com/6bf8628e-9d52-4345-b75c-558a66a95d4c.zip [omitted]
+[info] ✔  functions: functions source uploaded successfully 
+[info] i  functions: updating Node.js 20 (2nd Gen) function polymarketReadMcp(us-central1)... 
+[info] i  functions: updating Node.js 20 (2nd Gen) function issueMcpToken(us-central1)... 
+[debug] [2025-11-28T07:17:44.790Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:44.791Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:44.791Z] >>> [apiv2][query] PATCH https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp updateMask=name%2CbuildConfig.runtime%2CbuildConfig.entryPoint%2CbuildConfig.source.storageSource.bucket%2CbuildConfig.source.storageSource.object%2CbuildConfig.environmentVariables%2CbuildConfig.sourceToken%2CserviceConfig.environmentVariables%2CserviceConfig.ingressSettings%2CserviceConfig.timeoutSeconds%2CserviceConfig.serviceAccountEmail%2CserviceConfig.availableMemory%2CserviceConfig.minInstanceCount%2CserviceConfig.maxInstanceCount%2CserviceConfig.maxInstanceRequestConcurrency%2CserviceConfig.availableCpu%2CserviceConfig.vpcConnector%2CserviceConfig.vpcConnectorEgressSettings%2Clabels
+[debug] [2025-11-28T07:17:44.791Z] >>> [apiv2][body] PATCH https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp {"name":"projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp","buildConfig":{"runtime":"nodejs20","entryPoint":"polymarketReadMcp","source":{"storageSource":{"bucket":"gcf-v2-uploads-734175123527.us-central1.cloudfunctions.appspot.com","object":"6bf8628e-9d52-4345-b75c-558a66a95d4c.zip"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""}},"serviceConfig":{"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"audit-3a7ec\",\"storageBucket\":\"audit-3a7ec.firebasestorage.app\"}","GCLOUD_PROJECT":"audit-3a7ec","EVENTARC_CLOUD_EVENT_SOURCE":"projects/audit-3a7ec/locations/us-central1/services/polymarketReadMcp","FUNCTION_TARGET":"polymarketReadMcp","LOG_EXECUTION_ID":"true","FUNCTION_SIGNATURE_TYPE":"http"},"ingressSettings":null,"timeoutSeconds":null,"serviceAccountEmail":null,"availableMemory":"256Mi","minInstanceCount":null,"maxInstanceCount":null,"maxInstanceRequestConcurrency":80,"availableCpu":"1","vpcConnector":null,"vpcConnectorEgressSettings":null},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"79151641a43eb6303d3ef762a1811788d7a5e1e2"}}
+[debug] [2025-11-28T07:17:46.472Z] <<< [apiv2][status] PATCH https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp 200
+[debug] [2025-11-28T07:17:46.473Z] <<< [apiv2][body] PATCH https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp {"name":"projects/audit-3a7ec/locations/us-central1/operations/operation-1764314265515-644a26d11761a-345f99e0-fbd7298f","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-11-28T07:17:46.339086690Z","target":"projects/audit-3a7ec/locations/us-central1/functions/polymarketReadMcp","verb":"update","cancelRequested":false,"apiVersion":"v2"},"done":false}
+[debug] [2025-11-28T07:17:46.473Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:46.473Z] Checked if tokens are valid: true, expires at: 1764317586852
+[debug] [2025-11-28T07:17:46.473Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/audit-3a7ec/locations/us-central1/operations/operation-1764314265515-644a26d11761a-345f99e0-fbd7298f [none]

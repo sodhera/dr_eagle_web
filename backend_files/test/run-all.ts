@@ -1,0 +1,15 @@
+import "./auth.test";
+import "./polymarketAdapter.test";
+import "./movementComparison.test";
+import "./marketDataAdapter.test";
+import "./security.test";
+import "./rateLimiter.test";
+import "./polymarketReadAdapter.test";
+import "./polymarketReadAgent.test";
+import "./polymarketReadMcp.test";
+import "./clobReadClient.test";
+import "./mcpScopes.test";
+import "./functionsCors.test";
+import "./agent/ChatService.test";
+import "../src/core/search/validation.test";
+import "../src/adapters/openai/webSearchClient.test";

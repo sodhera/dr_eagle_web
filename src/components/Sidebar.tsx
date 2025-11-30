@@ -21,6 +21,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
   const router = useRouter();
   const [showSettings, setShowSettings] = useState(false);
   const [chats, setChats] = useState<ChatSession[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -37,11 +38,14 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
 
   const loadChats = async () => {
     if (!user) return;
+    setIsLoading(true);
     try {
       const userChats = await getUserSessions();
       setChats(userChats);
     } catch (error) {
       console.error("Failed to load chats:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,7 +147,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         </svg>
       </button>
       <div className="sidebar-header">
-        <span className="sidebar-brand" onClick={() => router.push('/')}>Orecce</span>
+        <span className="sidebar-brand" onClick={() => { onNewChat(); router.push('/'); }}>Orecce</span>
       </div>
 
       <div className="sidebar-content">
@@ -170,62 +174,71 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
         </button>
         <div className="section-title">Your chats</div>
         <ul className="chat-list">
-          {chats.map(chat => (
-            <li
-              key={chat.id}
-              className={`chat-item ${currentSessionId === chat.id ? 'active' : ''}`}
-              onClick={() => onSelectChat(chat.id)}
-            >
-              {editingId === chat.id ? (
-                <form onSubmit={handleRenameSubmit} onClick={e => e.stopPropagation()} className="rename-form">
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={e => setEditTitle(e.target.value)}
-                    autoFocus
-                    onBlur={() => setEditingId(null)}
-                    className="rename-input"
-                  />
-                </form>
-              ) : (
-                <>
-                  <div className="chat-item-content">
-                    <span className="chat-title">{getChatTitle(chat)}</span>
-                  </div>
-                  <div className="chat-options">
-                    <button
-                      className={`options-btn ${menuOpenId === chat.id ? 'active' : ''}`}
-                      onClick={(e) => toggleMenu(e, chat.id)}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="19" cy="12" r="1" />
-                        <circle cx="5" cy="12" r="1" />
-                      </svg>
-                    </button>
-                    {menuOpenId === chat.id && (
-                      <div className="options-menu" ref={menuRef} onClick={e => e.stopPropagation()}>
-                        <div className="menu-item" onClick={(e) => handleRenameStart(e, chat)}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                          </svg>
-                          Rename
+          {isLoading ? (
+            // Skeleton Loader
+            Array.from({ length: 5 }).map((_, index) => (
+              <li key={`skeleton-${index}`} className="chat-item skeleton-item">
+                <div className="skeleton-text"></div>
+              </li>
+            ))
+          ) : (
+            chats.map(chat => (
+              <li
+                key={chat.id}
+                className={`chat-item ${currentSessionId === chat.id ? 'active' : ''}`}
+                onClick={() => onSelectChat(chat.id)}
+              >
+                {editingId === chat.id ? (
+                  <form onSubmit={handleRenameSubmit} onClick={e => e.stopPropagation()} className="rename-form">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      autoFocus
+                      onBlur={() => setEditingId(null)}
+                      className="rename-input"
+                    />
+                  </form>
+                ) : (
+                  <>
+                    <div className="chat-item-content">
+                      <span className="chat-title">{getChatTitle(chat)}</span>
+                    </div>
+                    <div className="chat-options">
+                      <button
+                        className={`options-btn ${menuOpenId === chat.id ? 'active' : ''}`}
+                        onClick={(e) => toggleMenu(e, chat.id)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="1" />
+                          <circle cx="19" cy="12" r="1" />
+                          <circle cx="5" cy="12" r="1" />
+                        </svg>
+                      </button>
+                      {menuOpenId === chat.id && (
+                        <div className="options-menu" ref={menuRef} onClick={e => e.stopPropagation()}>
+                          <div className="menu-item" onClick={(e) => handleRenameStart(e, chat)}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Rename
+                          </div>
+                          <div className="menu-item delete" onClick={(e) => handleDeleteChat(e, chat.id)}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Delete
+                          </div>
                         </div>
-                        <div className="menu-item delete" onClick={(e) => handleDeleteChat(e, chat.id)}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                          Delete
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
+                      )}
+                    </div>
+                  </>
+                )}
+              </li>
+            ))
+          )}
         </ul>
       </div>
 
@@ -570,6 +583,44 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
 
         .chat-item.active {
           background-color: var(--bg-tertiary);
+        }
+
+        /* Skeleton Loader Styles */
+        .skeleton-item {
+          pointer-events: none;
+        }
+
+        .skeleton-text {
+          height: 12px;
+          width: 100%;
+          background: var(--bg-tertiary);
+          border-radius: 4px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .skeleton-text::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          transform: translateX(-100%);
+          background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.05) 20%,
+            rgba(255, 255, 255, 0.1) 60%,
+            rgba(255, 255, 255, 0)
+          );
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          100% {
+            transform: translateX(100%);
+          }
         }
 
         .sidebar-footer {

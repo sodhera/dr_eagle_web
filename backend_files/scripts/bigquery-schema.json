@@ -1,0 +1,152 @@
+[
+    {
+        "name": "timestamp",
+        "type": "TIMESTAMP",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "userId",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "sessionId",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "logType",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "level",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "environment",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "version",
+        "type": "STRING",
+        "mode": "REQUIRED"
+    },
+    {
+        "name": "metadata",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "chat_role",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "chat_content",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "chat_messageId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "chat_toolCalls",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "chat_toolCallId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_toolName",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_arguments",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_result",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_error",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_durationMs",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "mcp_success",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_code",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_inputData",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_output",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_error",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_durationMs",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "python_success",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "agent_action",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "agent_details",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "session_customInstructions",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "session_totalMessages",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "session_totalTools",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    }
+]

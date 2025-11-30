@@ -1,0 +1,24 @@
+URL: https://docs.polymarket.com/quickstart/introduction/showcase
+
+API Showcase
+Explore real-world products, tools, and websites powered by the Polymarket API.
+These are some of the projects, products, and tools that leverage our API to build innovative forecasting, analytics, and trading experiences.
+Adjacent
+Forward Looking News - Driven by Prediction Markets and Forecasting Platforms
+Polyfund
+PolyFund is a fully decentralized platform that enables skilled predictors to manage funds and investors to benefit from their expertise on Polymarket prediction markets.
+PredictFolio
+Analyze, compare, and track users on Polymarket. Gain an edge by analyzing other traders and comparing statistics.
+Nevua Markets
+Create Polymarket watchlists. Get real-time alerts for events that matter.
+OddsChad
+Track and analyze prediction markets in real-time
+​
+🤝 Want to be featured?
+If you’ve built something using the Polymarket API and want to be included here, reach out to us on
+Discord
+.
+⌘
+I
+github
+Powered by Mintlify

@@ -1,0 +1,34 @@
+URL: https://docs.polymarket.com/api-reference/health/health-check
+
+Health
+Health check
+GET
+/
+Try it
+Health check
+cURL
+Copy
+Ask AI
+curl --request GET \
+  --url https://data-api.polymarket.com/
+200
+Copy
+Ask AI
+{
+  "data": "OK"
+}
+Response
+200 - application/json
+OK
+​
+data
+string
+Example
+:
+"OK"
+Fetching Markets
+List teams
+⌘
+I
+github
+Powered by Mintlify

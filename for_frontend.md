@@ -251,3 +251,40 @@ If you are building a dedicated UI for trackers, you can use the agent to fetch 
 
 **Notifications**:
 Trackers generate notifications based on analysis. Currently, these are stored in the backend. Future updates will support push notifications or webhooks.
+
+### New Tracking Tools (History & Alerts)
+
+The following tools have been added to allow the agent to retrieve past tracking data. You can access these by asking the agent relevant questions.
+
+-   `get_tracker_runs`: Retrieve execution history for a specific tracker.
+    -   *User*: "Show me the last 5 runs for my Bitcoin tracker."
+-   `get_tracker_notifications`: Retrieve past alerts/notifications for a tracker.
+    -   *User*: "What alerts did I get from the Nigeria election tracker?"
+
+### Integration Summary
+
+To integrate tracking features into your frontend:
+
+1.  **Creation**: Use the chat interface. The user asks the agent to create a tracker.
+2.  **Monitoring**: Use the chat interface OR the new REST API endpoints below.
+
+### Tracking Dashboard API (REST)
+
+You can now build a live dashboard using these endpoints. All require the same `Authorization: Bearer <backend-token>` header.
+
+**1. List Trackers**
+- `GET /agent/trackers`
+- Returns: Array of active trackers.
+
+**2. Get Tracker Details**
+- `GET /agent/trackers/:trackerId`
+- Returns: Single tracker object with configuration.
+
+**3. Get Run History**
+- `GET /agent/trackers/:trackerId/runs?limit=20`
+- Returns: Array of past executions (timestamps, changes detected, analysis results).
+- Use this to plot graphs or show activity logs.
+
+**4. Get Notifications**
+- `GET /agent/trackers/:trackerId/notifications?limit=20`
+- Returns: Array of past alerts sent to the user.

@@ -126,7 +126,8 @@ const BookmarkIcon = ({ className, filled }: { className?: string, filled?: bool
 
 // --- Helper Components ---
 
-const PercentageChange = ({ value }: { value: number }) => {
+const PercentageChange = ({ value }: { value: number | undefined | null }) => {
+    if (value === undefined || value === null) return <span className="text-gray-500">-</span>;
     const isPositive = value >= 0;
     const color = isPositive ? '#10B981' : '#EF4444'; // Green or Red
     const Icon = isPositive ? TrendingUpIcon : TrendingDownIcon;
@@ -148,7 +149,8 @@ const formatCurrency = (value: number) => {
     }).format(value);
 };
 
-const formatNumber = (num: number) => {
+const formatNumber = (num: number | undefined | null) => {
+    if (num === undefined || num === null) return '0';
     if (num >= 1000000) {
         return (num / 1000000).toFixed(1) + 'M';
     }
@@ -158,7 +160,8 @@ const formatNumber = (num: number) => {
     return num.toFixed(0);
 };
 
-const formatPercentage = (probability: number) => {
+const formatPercentage = (probability: number | undefined | null) => {
+    if (probability === undefined || probability === null) return "0%";
     const percentage = probability * 100;
     if (percentage === 0) return "0%";
     if (percentage < 1) return percentage.toFixed(1) + "%";
@@ -168,26 +171,34 @@ const formatPercentage = (probability: number) => {
 // --- Main Component ---
 
 export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
+    if (!data || !data.instrument || !data.outcomes) {
+        return <div className="p-4 text-red-400">Error: Invalid widget data</div>;
+    }
+
     const { instrument, outcomes, series } = data;
     const [isBookmarked, setIsBookmarked] = useState(false);
 
     // Use the outcome with the highest probability as the primary one
-    const primaryOutcome = [...outcomes].sort((a, b) => b.current_probability - a.current_probability)[0] || outcomes[0];
+    const primaryOutcome = [...outcomes].sort((a, b) => (b.current_probability || 0) - (a.current_probability || 0))[0] || outcomes[0];
 
     // Flatten data for the chart
     const chartDataMap = new Map<number, any>();
 
-    series.forEach(s => {
-        s.points.forEach(point => {
-            const existing = chartDataMap.get(point.t) || { time: point.t };
-            // Find outcome label for this series
-            const outcome = outcomes.find(o => o.outcome_id === s.outcome_id);
-            if (outcome) {
-                existing[outcome.label] = point.p; // Using probability 'p' for the chart
+    if (series && Array.isArray(series)) {
+        series.forEach(s => {
+            if (s.points) {
+                s.points.forEach(point => {
+                    const existing = chartDataMap.get(point.t) || { time: point.t };
+                    // Find outcome label for this series
+                    const outcome = outcomes.find(o => o.outcome_id === s.outcome_id);
+                    if (outcome) {
+                        existing[outcome.label] = point.p; // Using probability 'p' for the chart
+                    }
+                    chartDataMap.set(point.t, existing);
+                });
             }
-            chartDataMap.set(point.t, existing);
         });
-    });
+    }
 
     let chartData = Array.from(chartDataMap.values()).sort((a, b) => a.time - b.time);
 
@@ -225,13 +236,13 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
             {/* Price Hero */}
             <div className="price-hero">
                 <div className="big-price-label" style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', marginBottom: '4px', fontWeight: 500 }}>
-                    {primaryOutcome.label}
+                    {primaryOutcome?.label || 'Unknown'}
                 </div>
                 <div className="big-price">
-                    {formatPercentage(primaryOutcome.current_probability)}
+                    {formatPercentage(primaryOutcome?.current_probability)}
                 </div>
                 <div className="price-change-badge">
-                    <PercentageChange value={primaryOutcome.price_24h_change_pct} />
+                    <PercentageChange value={primaryOutcome?.price_24h_change_pct} />
                     <span className="time-period">Today</span>
                 </div>
             </div>
@@ -318,7 +329,7 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
                         <BarChartIcon className="stat-icon" />
                         Volume
                     </div>
-                    <div className="stat-value">${formatNumber(instrument.metrics.total_volume_usd)}</div>
+                    <div className="stat-value">${formatNumber(instrument.metrics?.total_volume_usd)}</div>
                 </div>
                 <div className="stat-divider" />
                 <div className="stat-item">
@@ -326,7 +337,7 @@ export default function PolymarketWidget({ data }: PolymarketWidgetProps) {
                         <DollarSignIcon className="stat-icon" />
                         Liquidity
                     </div>
-                    <div className="stat-value">${formatNumber(instrument.metrics.liquidity_usd)}</div>
+                    <div className="stat-value">${formatNumber(instrument.metrics?.liquidity_usd)}</div>
                 </div>
             </div>
 

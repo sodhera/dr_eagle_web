@@ -1,0 +1,62 @@
+URL: https://docs.polymarket.com/api-reference/pricing/get-market-price
+
+Pricing
+Get market price
+Retrieves the market price for a specific token and side
+GET
+/
+price
+Try it
+Get market price
+cURL
+Copy
+Ask AI
+curl
+--request
+GET
+\
+--url
+https://clob.polymarket.com/price
+200
+example
+Copy
+Ask AI
+{
+"price"
+:
+"1800.50"
+}
+Query Parameters
+​
+token_id
+string
+required
+The unique identifier for the token
+​
+side
+enum<string>
+required
+The side of the market (BUY or SELL)
+Available options
+:
+BUY
+,
+SELL
+Response
+200
+application/json
+Successful response
+​
+price
+string
+required
+The market price (as string to maintain precision)
+Example
+:
+"1800.50"
+Get multiple order books summaries by request
+Get multiple market prices
+⌘
+I
+github
+Powered by Mintlify
