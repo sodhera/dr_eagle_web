@@ -46,11 +46,23 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
       {/* Right Side - Form */}
       <div className="auth-form-container">
         <div className="auth-header">
-          {mode === 'login' ? (
-            <Link href="/signup" className="toggle-btn">Sign Up</Link>
-          ) : (
-            <Link href="/login" className="toggle-btn">Login</Link>
-          )}
+          <div className="toggle-container">
+            <Link href="/login" className={`toggle-item ${mode === 'login' ? 'active' : ''}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                <polyline points="10 17 15 12 10 7"></polyline>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+              </svg>
+              Login
+            </Link>
+            <Link href="/signup" className={`toggle-item ${mode === 'signup' ? 'active' : ''}`}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Sign Up
+            </Link>
+          </div>
         </div>
         <div className="form-content">
           {children}
@@ -182,23 +194,43 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
 
         .auth-header {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center; /* Centered the toggle button */
             margin-bottom: 2rem;
         }
 
-        .toggle-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #e5e7eb;
+        .toggle-container {
+            display: flex;
+            background-color: #f3f4f6;
+            padding: 4px;
             border-radius: 8px;
-            color: #374151;
-            text-decoration: none;
+            gap: 4px;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px; /* Increased padding for better touch target */
+            border-radius: 6px;
             font-size: 0.9rem;
             font-weight: 500;
+            color: #6b7280;
+            text-decoration: none;
             transition: all 0.2s;
+            border: 1px solid transparent; /* Prevent layout shift on active state */
+        }
+
+        .toggle-item.active {
+            background-color: #fff;
+            color: #111;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Stronger shadow */
+            border-color: #e5e7eb; /* Added border for better definition */
+            font-weight: 600; /* Bolder text for active state */
         }
         
-        .toggle-btn:hover {
-            background-color: #f9fafb;
+        .toggle-item:hover:not(.active) {
+            color: #374151;
+            background-color: rgba(0,0,0,0.03); /* Subtle hover effect */
         }
 
         .form-content {

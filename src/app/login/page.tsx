@@ -42,7 +42,7 @@ export default function LoginPage() {
     return (
         <AuthLayout mode="login">
             <div className="form-container">
-                <h1 className="title">Welcome back</h1>
+                <h1 className="title">Welcome to Orecce</h1>
                 <p className="subtitle">Please enter your details to sign in.</p>
 
                 <SocialButtons />
