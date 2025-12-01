@@ -9,6 +9,7 @@ export type AnalysisType = 'computational' | 'ai';
 export interface Tracker {
     id: TrackerId;
     ownerId: UserId;
+    title?: string; // Added title
     visibility: TrackerVisibility;
     target: TrackerTarget;
     mode: TrackerMode;
@@ -18,6 +19,9 @@ export interface Tracker {
     status: TrackerStatus;
     createdAt: number;
     updatedAt: number;
+    consecutiveFailures?: number; // Added
+    cooldownUntil?: number; // Added
+    cooldownReason?: string; // Added
     // For shared trackers
     createdBy?: UserId;
     allowedRoles?: string[];
@@ -38,7 +42,8 @@ export type TrackerAnalysis =
 
 export interface TrackerSchedule {
     type: 'cron' | 'interval';
-    value: string; // e.g. "0 9 * * *" or "3600" (seconds)
+    value: string; // e.g. "0 9 * * *" or "3600"
+    unit?: 'seconds' | 'minutes' | 'hours' | 'days'; // Added unit
 }
 
 export interface TrackerNotification {
@@ -56,6 +61,7 @@ export interface TrackerRun {
     analysisResult?: AnalysisResult;
     status: 'pending' | 'completed' | 'failed';
     error?: string;
+    aiOutput?: string; // Added raw AI response
 }
 
 export interface ChangeEvent {
@@ -85,8 +91,11 @@ export interface AnalysisResult {
 export interface NotificationRecord {
     id: string;
     trackerId: TrackerId;
+    runId?: string; // Added
+    userId?: string; // Added
     timestamp: number;
     channel: string;
+    reason?: 'trigger' | 'scheduled'; // Added
     status: 'sent' | 'failed' | 'pending';
     content?: string;
     error?: string;

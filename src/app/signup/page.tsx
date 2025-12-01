@@ -99,13 +99,19 @@ export default function SignupPage() {
                 </form>
 
                 <div className="footer">
-                    Already have an account? <Link href="/login" className="link">Sign in</Link>
+                    Already have an account?{' '}
+                    <Link href="/login" className="footer-link">
+                        <span className="footer-link-label">Sign in</span>
+                    </Link>
                 </div>
             </div>
 
             <style jsx>{`
                 .form-container {
                     width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
                 }
 
                 .title {
@@ -200,18 +206,23 @@ export default function SignupPage() {
 
                 .footer {
                     text-align: center;
-                    margin-top: 1rem; /* Reduced margin */
+                    margin-top: auto;
+                    padding-top: 2rem;
                     font-size: 0.9rem;
                     color: #666;
                 }
 
-                .link {
-                    color: #2563eb; /* Blue highlight */
-                    font-weight: 600;
-                    text-decoration: none; /* Remove underline for cleaner look, or keep it if preferred. Let's remove it and rely on color/weight */
+                .footer-link {
+                    text-decoration: none;
                 }
-                .link:hover {
-                    text-decoration: underline;
+
+                .footer-link-label {
+                    font-weight: 500;
+                    color: #000;
+                }
+
+                .footer-link-label:hover {
+                    color: #111111;
                 }
 
                 .error-message {

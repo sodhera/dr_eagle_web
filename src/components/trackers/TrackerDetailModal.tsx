@@ -86,13 +86,30 @@ export default function TrackerDetailModal({ tracker, onClose, onDelete }: Track
                                         {runs.map(run => (
                                             <div key={run.id} className="list-item">
                                                 <div className={`status-dot ${run.status === 'completed' ? 'completed' : 'pending'}`}></div>
-                                                <div>
-                                                    <p className="item-title">
-                                                        {run.analysisResult?.summary || "Run completed"}
-                                                    </p>
-                                                    <span className="item-subtitle">
-                                                        {new Date(run.timestamp).toLocaleString()}
-                                                    </span>
+                                                <div className="w-full">
+                                                    <div className="flex justify-between items-start">
+                                                        <p className="item-title">
+                                                            {run.analysisResult?.summary || "Run completed"}
+                                                        </p>
+                                                        <span className="item-subtitle">
+                                                            {new Date(run.timestamp).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    {run.analysisResult?.footnote && (
+                                                        <p className="item-detail mt-1">
+                                                            {run.analysisResult.footnote}
+                                                        </p>
+                                                    )}
+                                                    {run.aiOutput && (
+                                                        <div className="mt-2">
+                                                            <details className="text-xs text-[var(--text-secondary)]">
+                                                                <summary className="cursor-pointer hover:text-[var(--text-primary)]">View Raw AI Output</summary>
+                                                                <pre className="item-detail mt-1 overflow-x-auto">
+                                                                    {run.aiOutput}
+                                                                </pre>
+                                                            </details>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -114,13 +131,27 @@ export default function TrackerDetailModal({ tracker, onClose, onDelete }: Track
                                                 <div className="channel-badge">
                                                     {notif.channel}
                                                 </div>
-                                                <div>
-                                                    <p className="item-title">
-                                                        {notif.status}
-                                                    </p>
-                                                    <span className="item-subtitle">
-                                                        {new Date(notif.timestamp).toLocaleString()}
-                                                    </span>
+                                                <div className="w-full">
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <p className="item-title capitalize">
+                                                                {notif.status}
+                                                            </p>
+                                                            {notif.reason && (
+                                                                <span className="text-xs text-[var(--text-secondary)] bg-[var(--bg-tertiary)] px-1.5 py-0.5 rounded ml-2">
+                                                                    {notif.reason}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <span className="item-subtitle">
+                                                            {new Date(notif.timestamp).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    {notif.content && (
+                                                        <p className="item-detail mt-1">
+                                                            {notif.content}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -368,6 +399,35 @@ export default function TrackerDetailModal({ tracker, onClose, onDelete }: Track
                 .action-btn:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
+                }
+                .item-detail {
+                    font-size: 0.75rem;
+                    color: var(--text-secondary);
+                    background-color: var(--bg-tertiary);
+                    padding: 0.5rem;
+                    border-radius: var(--radius-sm);
+                    margin-top: 0.5rem;
+                    white-space: pre-wrap;
+                }
+
+                .w-full {
+                    width: 100%;
+                }
+
+                .flex {
+                    display: flex;
+                }
+
+                .justify-between {
+                    justify-content: space-between;
+                }
+
+                .items-start {
+                    align-items: flex-start;
+                }
+
+                .capitalize {
+                    text-transform: capitalize;
                 }
             `}</style>
         </div>

@@ -50,7 +50,7 @@ export default function TrackerCard({ tracker, onClick }: TrackerCardProps) {
 
             <div className="card-header">
                 <div>
-                    <h3 className="card-title">{getTargetLabel(tracker.target)}</h3>
+                    <h3 className="card-title">{tracker.title || getTargetLabel(tracker.target)}</h3>
                     <span className={`status-badge ${tracker.status}`}>
                         {tracker.status}
                     </span>

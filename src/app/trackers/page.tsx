@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { listTrackers, createTracker } from '@/services/trackerClient';
+import { listTrackers } from '@/services/trackerClient';
 import { Tracker } from '@/types/tracking';
 import CentralTrackerWidget from '@/components/trackers/CentralTrackerWidget';
 import TrackerCard from '@/components/trackers/TrackerCard';
@@ -19,7 +19,6 @@ export default function TrackersPage() {
     const router = useRouter();
 
     const [error, setError] = useState<string | null>(null);
-    const [creating, setCreating] = useState(false);
 
     const loadTrackers = async () => {
         try {
@@ -46,28 +45,6 @@ export default function TrackersPage() {
         loadTrackers();
     }, [user, authLoading, router]);
 
-    const handleCreateTestTracker = async () => {
-        setCreating(true);
-        try {
-            const newTracker = {
-                ownerId: user?.uid || 'unknown',
-                visibility: 'personal' as const,
-                target: { type: 'googleNewsRssSearch' as const, querySpec: { q: 'AI Agents' }, edition: 'US' },
-                mode: 'regular' as const,
-                analysis: { type: 'ai' as const, promptTemplateId: 'default_persona' },
-                schedule: { type: 'interval' as const, value: '3600' },
-                notification: { channels: ['mcp_callback'] },
-                status: 'active' as const,
-            };
-            await createTracker(newTracker);
-            await loadTrackers();
-        } catch (err: any) {
-            console.error("Failed to create tracker", err);
-            setError(err.message || "Failed to create tracker");
-        } finally {
-            setCreating(false);
-        }
-    };
 
     return (
         <div className="page-container">
@@ -86,13 +63,6 @@ export default function TrackersPage() {
                                 <h1 className="page-title">Trackers</h1>
                                 <p className="page-subtitle">Manage your automated monitoring agents</p>
                             </div>
-                            <button
-                                onClick={handleCreateTestTracker}
-                                disabled={creating}
-                                className="create-btn"
-                            >
-                                {creating ? 'Creating...' : '+ Create Test Tracker'}
-                            </button>
                         </header>
 
                         {error ? (
@@ -111,13 +81,6 @@ export default function TrackersPage() {
                         ) : trackers.length === 0 ? (
                             <div className="empty-state">
                                 <p>No trackers found.</p>
-                                <button
-                                    onClick={handleCreateTestTracker}
-                                    disabled={creating}
-                                    className="create-btn"
-                                >
-                                    {creating ? 'Creating Test Tracker...' : 'Create Test Tracker'}
-                                </button>
                             </div>
                         ) : (
                             <>

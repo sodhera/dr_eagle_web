@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import bgImage from '../../public/login-bg.png';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -85,11 +86,12 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
         <div className="auth-visual-content">
           <div className="image-overlay"></div>
           <Image
-            src="/login-bg.png" // Using existing background or placeholder
+            src={bgImage}
             alt="Auth Background"
             fill
             style={{ objectFit: 'cover' }}
             priority
+            placeholder="blur"
           />
 
           <div className="testimonial-card">
@@ -136,7 +138,9 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
               </span>
             </Link>
           </div>
-          {children}
+          <div className="form-wrapper">
+            {children}
+          </div>
         </div>
       </div>
 
@@ -227,7 +231,7 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
 
         .testimonial-nav {
           display: flex;
-          gap: 1rem;
+          gap: 0.5rem;
         }
 
         .nav-btn {
@@ -252,6 +256,8 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           flex: 1;
           display: flex;
           flex-direction: column;
+          justify-content: center;
+          align-items: center;
           padding: 1.5rem; /* Reduced padding */
           max-width: 100%;
           background-color: #fff;
@@ -274,14 +280,40 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
             margin: 0 auto;
             width: 100%;
             padding: 2rem 0;
-            min-height: 720px; /* keeps toggle vertically consistent between pages */
+        }
+
+        .form-wrapper {
+          flex: 0 0 580px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+        }
+
+        @media (max-height: 900px) {
+          .auth-form-container {
+            justify-content: flex-start;
+          }
+
+          .form-content {
+            justify-content: flex-start;
+          }
+
+          .form-wrapper {
+            flex: 1;
+            height: auto;
+          }
+
+          .auth-toggle {
+            margin-bottom: 1.5rem;
+          }
         }
 
         .auth-toggle {
           display: inline-flex;
           align-self: center;
           gap: 0.2rem;
-          margin-bottom: 1.25rem;
+          margin-bottom: 6rem;
           padding: 0.18rem;
           border-radius: 12px;
           background: #f8fbff;

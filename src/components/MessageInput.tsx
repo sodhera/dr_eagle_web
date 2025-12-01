@@ -18,6 +18,12 @@ export default function MessageInput({ value, onChange, onSend, disabled }: Mess
     }
   }, [value]);
 
+  useEffect(() => {
+    if (!disabled && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [disabled]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -80,10 +86,6 @@ export default function MessageInput({ value, onChange, onSend, disabled }: Mess
           gap: var(--spacing-sm);
           transition: all 0.2s ease;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Elevated shadow */
-        }
-
-        .input-box:focus-within {
-          border-color: var(--accent-primary);
         }
 
         .message-input {

@@ -82,13 +82,19 @@ export default function LoginPage() {
                 </form>
 
                 <div className="footer">
-                    Don't have an account? <Link href="/signup" className="link">Sign up</Link>
+                    Don't have an account?{' '}
+                    <Link href="/signup" className="footer-link">
+                        <span className="footer-link-label">Sign up</span>
+                    </Link>
                 </div>
             </div>
 
             <style jsx>{`
                 .form-container {
                     width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
                 }
 
                 .title {
@@ -181,18 +187,23 @@ export default function LoginPage() {
 
                 .footer {
                     text-align: center;
-                    margin-top: 2rem;
+                    margin-top: auto;
+                    padding-top: 2rem;
                     font-size: 0.9rem;
                     color: #666;
                 }
 
-                .link {
-                    color: #2563eb; /* Blue highlight */
-                    font-weight: 600;
+                .footer-link {
                     text-decoration: none;
                 }
-                .link:hover {
-                    text-decoration: underline;
+
+                .footer-link-label {
+                    font-weight: 500;
+                    color: #000;
+                }
+
+                .footer-link-label:hover {
+                    color: #111111;
                 }
 
                 .error-message {
