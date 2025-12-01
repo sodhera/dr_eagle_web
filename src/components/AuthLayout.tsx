@@ -26,14 +26,14 @@ const LoginIcon = () => (
       strokeLinejoin="round"
     />
     <path
-      d="M7 11 4 8l3-3"
+      d="M9 11l3-3-3-3"
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
-      d="M4 8h7"
+      d="M12 8H3"
       stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
@@ -121,9 +121,7 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
               className="toggle-link"
             >
               <span className={`toggle-btn ${mode === 'login' ? 'active' : ''}`}>
-                <span className="icon-badge">
-                  <LoginIcon />
-                </span>
+                <LoginIcon />
                 <span>Login</span>
               </span>
             </Link>
@@ -133,9 +131,7 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
               className="toggle-link"
             >
               <span className={`toggle-btn ${mode === 'signup' ? 'active' : ''}`}>
-                <span className="icon-badge">
-                  <SignupIcon />
-                </span>
+                <SignupIcon />
                 <span>Sign Up</span>
               </span>
             </Link>
@@ -277,6 +273,8 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
             max-width: 400px;
             margin: 0 auto;
             width: 100%;
+            padding: 2rem 0;
+            min-height: 720px; /* keeps toggle vertically consistent between pages */
         }
 
         .auth-toggle {
@@ -286,7 +284,6 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           margin-bottom: 1.25rem;
           padding: 0.18rem;
           border-radius: 12px;
-          border: 1px solid #dbeafe;
           background: #f8fbff;
           box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08);
         }
@@ -311,17 +308,6 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           cursor: pointer;
         }
 
-        .toggle-btn .icon-badge {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 19px;
-          height: 19px;
-          border-radius: 5px;
-          border: 1px solid #e5e7eb;
-          background: #fff;
-        }
-
         .toggle-btn svg {
           width: 16px;
           height: 16px;
@@ -329,24 +315,12 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
 
         .toggle-btn.active {
           background: #fff;
-          border-color: #5b4ef5;
-          color: #1f1c53;
-          box-shadow: 0 10px 24px rgba(91, 78, 245, 0.2);
-        }
-
-        .toggle-btn.active .icon-badge {
-          border-color: rgba(91, 78, 245, 0.35);
-          background: rgba(91, 78, 245, 0.15);
-          color: #4c1d95;
+          border-color: #d1d5db;
+          color: #111827;
         }
 
         .toggle-btn:not(.active) {
           color: #6b7280;
-        }
-
-        .toggle-btn:not(.active) .icon-badge {
-          color: #6b7280;
-          background: rgba(255, 255, 255, 0.7);
         }
 
         .toggle-btn:hover {
