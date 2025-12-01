@@ -3,7 +3,7 @@ export type UserId = string;
 
 export type TrackerVisibility = 'personal' | 'shared';
 export type TrackerMode = 'regular' | 'irregular';
-export type TrackerStatus = 'active' | 'paused' | 'error';
+export type TrackerStatus = 'active' | 'paused' | 'error' | 'running';
 export type AnalysisType = 'computational' | 'ai';
 
 export interface Tracker {
