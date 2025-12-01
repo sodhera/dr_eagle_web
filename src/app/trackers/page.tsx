@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { listTrackers } from '@/services/trackerClient';
+import { listTrackers, createTracker } from '@/services/trackerClient';
 import { Tracker } from '@/types/tracking';
 import CentralTrackerWidget from '@/components/trackers/CentralTrackerWidget';
 import TrackerCard from '@/components/trackers/TrackerCard';
@@ -19,6 +19,23 @@ export default function TrackersPage() {
     const router = useRouter();
 
     const [error, setError] = useState<string | null>(null);
+    const [creating, setCreating] = useState(false);
+
+    const loadTrackers = async () => {
+        try {
+            setLoading(true);
+            console.log("Loading trackers...");
+            const data = await listTrackers();
+            console.log("Trackers loaded:", data);
+            setTrackers(data);
+            setError(null);
+        } catch (error: any) {
+            console.error("Failed to load trackers", error);
+            setError(error.message || "Failed to load trackers");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (authLoading) return;
@@ -26,26 +43,34 @@ export default function TrackersPage() {
             router.push('/login');
             return;
         }
-
-        const loadTrackers = async () => {
-            try {
-                console.log("Loading trackers...");
-                const data = await listTrackers();
-                console.log("Trackers loaded:", data);
-                setTrackers(data);
-                setError(null);
-            } catch (error: any) {
-                console.error("Failed to load trackers", error);
-                setError(error.message || "Failed to load trackers");
-            } finally {
-                setLoading(false);
-            }
-        };
         loadTrackers();
     }, [user, authLoading, router]);
 
+    const handleCreateTestTracker = async () => {
+        setCreating(true);
+        try {
+            const newTracker = {
+                ownerId: user?.uid || 'unknown',
+                visibility: 'personal' as const,
+                target: { type: 'googleNewsRssSearch' as const, querySpec: { q: 'AI Agents' }, edition: 'US' },
+                mode: 'regular' as const,
+                analysis: { type: 'ai' as const, promptTemplateId: 'default_persona' },
+                schedule: { type: 'interval' as const, value: '3600' },
+                notification: { channels: ['mcp_callback'] },
+                status: 'active' as const,
+            };
+            await createTracker(newTracker);
+            await loadTrackers();
+        } catch (err: any) {
+            console.error("Failed to create tracker", err);
+            setError(err.message || "Failed to create tracker");
+        } finally {
+            setCreating(false);
+        }
+    };
+
     return (
-        <div className="flex h-screen bg-[var(--bg-primary)]">
+        <div className="page-container">
             <Sidebar
                 isOpen={isSidebarOpen}
                 onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -53,33 +78,45 @@ export default function TrackersPage() {
                 onSelectChat={(sessionId: string) => router.push(`/?chatId=${sessionId}`)}
                 currentSessionId={null}
             />
-            <main className={`flex-1 flex flex-col transition-all duration-300 overflow-hidden ${isSidebarOpen ? 'ml-0' : 'ml-0'}`}>
-                <div className="flex-1 overflow-y-auto p-8">
-                    <div className="max-w-5xl mx-auto space-y-8">
-                        <header className="flex justify-between items-center">
+            <main className={`main-content ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                <div className="content-scroll">
+                    <div className="content-wrapper">
+                        <header className="page-header">
                             <div>
-                                <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Trackers</h1>
-                                <p className="text-[var(--text-secondary)] text-sm mt-1">Manage your automated monitoring agents</p>
+                                <h1 className="page-title">Trackers</h1>
+                                <p className="page-subtitle">Manage your automated monitoring agents</p>
                             </div>
-                            <button className="px-4 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-secondary)] text-white rounded-lg text-sm font-medium transition-colors">
-                                + New Tracker
+                            <button
+                                onClick={handleCreateTestTracker}
+                                disabled={creating}
+                                className="create-btn"
+                            >
+                                {creating ? 'Creating...' : '+ Create Test Tracker'}
                             </button>
                         </header>
 
                         {error ? (
-                            <div className="text-red-500 text-center py-10 border border-red-500 rounded p-4">
-                                Error: {error}
+                            <div className="error-container">
+                                <p className="error-title">Error loading trackers:</p>
+                                <p>{error}</p>
+                                <button
+                                    onClick={() => loadTrackers()}
+                                    className="retry-btn"
+                                >
+                                    Retry
+                                </button>
                             </div>
                         ) : loading ? (
-                            <div className="text-[var(--text-secondary)] text-center py-10">Loading trackers...</div>
+                            <div className="loading-state">Loading trackers...</div>
                         ) : trackers.length === 0 ? (
-                            <div className="text-[var(--text-secondary)] text-center py-10">
+                            <div className="empty-state">
                                 <p>No trackers found.</p>
                                 <button
-                                    onClick={() => window.location.reload()}
-                                    className="mt-4 px-4 py-2 bg-[var(--bg-tertiary)] rounded text-sm"
+                                    onClick={handleCreateTestTracker}
+                                    disabled={creating}
+                                    className="create-btn"
                                 >
-                                    Reload Page
+                                    {creating ? 'Creating Test Tracker...' : 'Create Test Tracker'}
                                 </button>
                             </div>
                         ) : (
@@ -89,8 +126,8 @@ export default function TrackersPage() {
                                 </section>
 
                                 <section>
-                                    <h2 className="text-lg font-medium text-[var(--text-primary)] mb-4">Active Trackers</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <h2 className="section-title">Active Trackers</h2>
+                                    <div className="trackers-grid">
                                         {trackers.map(tracker => (
                                             <TrackerCard
                                                 key={tracker.id}
@@ -110,21 +147,135 @@ export default function TrackersPage() {
                 <TrackerDetailModal
                     tracker={selectedTracker}
                     onClose={() => setSelectedTracker(null)}
+                    onDelete={(deletedId) => {
+                        setTrackers(prev => prev.filter(t => t.id !== deletedId));
+                        setSelectedTracker(null);
+                    }}
                 />
             )}
 
-            {/* Debug Info */}
-            <div className="fixed bottom-4 right-4 p-4 bg-black/80 text-white text-xs rounded max-w-md max-h-64 overflow-auto z-50">
-                <h3 className="font-bold mb-2">Debug Info</h3>
-                <pre>Loading: {String(loading)}</pre>
-                <pre>Error: {String(error)}</pre>
-                <pre>Trackers Count: {trackers.length}</pre>
-                <pre>User: {user ? user.uid : 'Not logged in'}</pre>
-                <details>
-                    <summary>Raw Trackers Data</summary>
-                    <pre>{JSON.stringify(trackers, null, 2)}</pre>
-                </details>
-            </div>
+            <style jsx>{`
+                .page-container {
+                    display: flex;
+                    height: 100vh;
+                    background-color: var(--bg-primary);
+                    overflow: hidden;
+                }
+
+                .main-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    transition: margin-left 0.3s ease;
+                    overflow: hidden;
+                }
+
+                .content-scroll {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 2rem;
+                }
+
+                .content-wrapper {
+                    max-width: 64rem; /* max-w-5xl */
+                    margin: 0 auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2rem; /* space-y-8 */
+                }
+
+                .page-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .page-title {
+                    font-size: 1.5rem; /* text-2xl */
+                    font-weight: 600;
+                    color: var(--text-primary);
+                }
+
+                .page-subtitle {
+                    color: var(--text-secondary);
+                    font-size: 0.875rem; /* text-sm */
+                    margin-top: 0.25rem;
+                }
+
+                .create-btn {
+                    padding: 0.5rem 1rem;
+                    background-color: var(--accent-primary);
+                    color: white;
+                    border-radius: var(--radius-md);
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    border: none;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                }
+
+                .create-btn:hover:not(:disabled) {
+                    background-color: var(--accent-hover);
+                }
+
+                .create-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                .error-container {
+                    text-align: center;
+                    padding: 2.5rem;
+                    border: 1px solid #ef4444;
+                    border-radius: var(--radius-md);
+                    color: #ef4444;
+                }
+
+                .error-title {
+                    font-weight: bold;
+                }
+
+                .retry-btn {
+                    margin-top: 1rem;
+                    padding: 0.5rem 1rem;
+                    background-color: var(--bg-tertiary);
+                    border-radius: var(--radius-md);
+                    font-size: 0.875rem;
+                    border: none;
+                    cursor: pointer;
+                }
+
+                .loading-state, .empty-state {
+                    text-align: center;
+                    padding: 2.5rem;
+                    color: var(--text-secondary);
+                }
+
+                .section-title {
+                    font-size: 1.125rem; /* text-lg */
+                    font-weight: 500;
+                    color: var(--text-primary);
+                    margin-bottom: 1rem;
+                }
+
+                .trackers-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+
+                @media (min-width: 768px) {
+                    .trackers-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (min-width: 1024px) {
+                    .trackers-grid {
+                        grid-template-columns: repeat(3, 1fr);
+                    }
+                }
+            `}</style>
         </div>
     );
 }

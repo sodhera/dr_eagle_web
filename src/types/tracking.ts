@@ -81,3 +81,13 @@ export interface AnalysisResult {
     triggered: boolean;
     footnote?: string;
 }
+
+export interface NotificationRecord {
+    id: string;
+    trackerId: TrackerId;
+    timestamp: number;
+    channel: string;
+    status: 'sent' | 'failed' | 'pending';
+    content?: string;
+    error?: string;
+}

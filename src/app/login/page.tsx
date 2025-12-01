@@ -187,8 +187,11 @@ export default function LoginPage() {
                 }
 
                 .link {
-                    color: #000;
+                    color: #2563eb; /* Blue highlight */
                     font-weight: 600;
+                    text-decoration: none;
+                }
+                .link:hover {
                     text-decoration: underline;
                 }
 

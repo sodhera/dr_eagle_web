@@ -13,10 +13,6 @@ export default function SocialButtons() {
         }
     };
 
-    const handlePlaceholderLogin = (provider: string) => {
-        console.log(`Login with ${provider} clicked`);
-    };
-
     return (
         <div className="social-buttons-container">
             <button className="social-btn" onClick={handleGoogleLogin}>
@@ -29,35 +25,6 @@ export default function SocialButtons() {
                     </svg>
                 </span>
                 Continue with Google
-            </button>
-
-            <button className="social-btn" onClick={() => handlePlaceholderLogin('Apple')}>
-                <span className="icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24.02-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.45-1.02 4.11-.72 1.53.28 2.51.82 3.19 1.83-2.99 1.86-2.47 6.08.58 7.34-.63 1.55-1.57 3.09-2.96 3.78zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                    </svg>
-                </span>
-                Continue with Apple
-            </button>
-
-            <button className="social-btn" onClick={() => handlePlaceholderLogin('Binance')}>
-                <span className="icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.624 13.832l2.717-2.716-2.717-2.717-1.973 1.973 2.717 2.717-2.717 2.717 1.973 1.973zm-4.624-4.624l-2.716 2.717 2.716 2.717 2.717-2.717-2.717-2.717zm-4.624 4.624l-2.717-2.716 2.717-2.717 1.973 1.973-2.717 2.717 2.717 2.717-1.973 1.973zm4.624 4.624l2.717 2.716 2.717-2.716-1.973-1.973-2.717 2.717-2.717-2.717-1.973 1.973zm0-9.248l-2.717-2.716-2.717 2.716 1.973 1.973 2.717-2.717 2.717 2.717 1.973-1.973z" />
-                    </svg>
-                </span>
-                Continue with Binance
-            </button>
-
-            <button className="social-btn" onClick={() => handlePlaceholderLogin('Wallet')}>
-                <span className="icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-                        <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-                    </svg>
-                </span>
-                Continue with Wallet
             </button>
 
             <style jsx>{`

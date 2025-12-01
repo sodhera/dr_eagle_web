@@ -9,6 +9,74 @@ interface AuthLayoutProps {
   mode: 'login' | 'signup';
 }
 
+const LoginIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <path
+      d="M9 3h3.5A1.5 1.5 0 0 1 14 4.5v7A1.5 1.5 0 0 1 12.5 13H9"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 11 4 8l3-3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4 8h7"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const SignupIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <circle
+      cx="6.5"
+      cy="5.5"
+      r="2.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M2.5 13c.7-1.9 2.4-3.5 4-3.5s3.3 1.6 4 3.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12.5 7.5v4m-2-2h4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default function AuthLayout({ children, mode }: AuthLayoutProps) {
   return (
     <div className="auth-container">
@@ -45,26 +113,33 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
 
       {/* Right Side - Form */}
       <div className="auth-form-container">
-        <div className="auth-header">
-          <div className="toggle-container">
-            <Link href="/login" className={`toggle-item ${mode === 'login' ? 'active' : ''}`}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                <polyline points="10 17 15 12 10 7"></polyline>
-                <line x1="15" y1="12" x2="3" y2="12"></line>
-              </svg>
-              Login
+        <div className="form-content">
+          <div className="auth-toggle">
+            <Link
+              href="/login"
+              aria-current={mode === 'login' ? 'page' : undefined}
+              className="toggle-link"
+            >
+              <span className={`toggle-btn ${mode === 'login' ? 'active' : ''}`}>
+                <span className="icon-badge">
+                  <LoginIcon />
+                </span>
+                <span>Login</span>
+              </span>
             </Link>
-            <Link href="/signup" className={`toggle-item ${mode === 'signup' ? 'active' : ''}`}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Sign Up
+            <Link
+              href="/signup"
+              aria-current={mode === 'signup' ? 'page' : undefined}
+              className="toggle-link"
+            >
+              <span className={`toggle-btn ${mode === 'signup' ? 'active' : ''}`}>
+                <span className="icon-badge">
+                  <SignupIcon />
+                </span>
+                <span>Sign Up</span>
+              </span>
             </Link>
           </div>
-        </div>
-        <div className="form-content">
           {children}
         </div>
       </div>
@@ -99,7 +174,7 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          padding: 3rem;
+          padding: 1.5rem; /* Reduced padding to bring card closer to edge */
         }
 
         .image-overlay {
@@ -122,7 +197,7 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           border-radius: 16px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           color: #fff;
-          max-width: 600px;
+          width: 100%; /* Ensure it fills the container */
         }
 
         .testimonial-text {
@@ -181,56 +256,17 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           flex: 1;
           display: flex;
           flex-direction: column;
-          padding: 2rem;
+          padding: 1.5rem; /* Reduced padding */
           max-width: 100%;
           background-color: #fff;
+          height: 100vh; /* Force full height */
+          overflow-y: auto; /* Allow internal scrolling if needed */
         }
 
         @media (min-width: 1024px) {
             .auth-form-container {
                 /* Removed max-width constraint to allow filling the remaining 50% */
             }
-        }
-
-        .auth-header {
-            display: flex;
-            justify-content: center; /* Centered the toggle button */
-            margin-bottom: 2rem;
-        }
-
-        .toggle-container {
-            display: flex;
-            background-color: #f3f4f6;
-            padding: 4px;
-            border-radius: 8px;
-            gap: 4px;
-        }
-
-        .toggle-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px; /* Increased padding for better touch target */
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #6b7280;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: 1px solid transparent; /* Prevent layout shift on active state */
-        }
-
-        .toggle-item.active {
-            background-color: #fff;
-            color: #111;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Stronger shadow */
-            border-color: #e5e7eb; /* Added border for better definition */
-            font-weight: 600; /* Bolder text for active state */
-        }
-        
-        .toggle-item:hover:not(.active) {
-            color: #374151;
-            background-color: rgba(0,0,0,0.03); /* Subtle hover effect */
         }
 
         .form-content {
@@ -241,6 +277,81 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
             max-width: 400px;
             margin: 0 auto;
             width: 100%;
+        }
+
+        .auth-toggle {
+          display: inline-flex;
+          align-self: center;
+          gap: 0.2rem;
+          margin-bottom: 1.25rem;
+          padding: 0.18rem;
+          border-radius: 12px;
+          border: 1px solid #dbeafe;
+          background: #f8fbff;
+          box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08);
+        }
+
+        .toggle-link {
+          text-decoration: none;
+          display: inline-flex;
+        }
+
+        .toggle-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.26rem 0.6rem;
+          border-radius: 9px;
+          border: 1px solid transparent;
+          color: #4b5563;
+          font-size: 0.78rem;
+          font-weight: 500;
+          text-decoration: none;
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .toggle-btn .icon-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 19px;
+          height: 19px;
+          border-radius: 5px;
+          border: 1px solid #e5e7eb;
+          background: #fff;
+        }
+
+        .toggle-btn svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        .toggle-btn.active {
+          background: #fff;
+          border-color: #5b4ef5;
+          color: #1f1c53;
+          box-shadow: 0 10px 24px rgba(91, 78, 245, 0.2);
+        }
+
+        .toggle-btn.active .icon-badge {
+          border-color: rgba(91, 78, 245, 0.35);
+          background: rgba(91, 78, 245, 0.15);
+          color: #4c1d95;
+        }
+
+        .toggle-btn:not(.active) {
+          color: #6b7280;
+        }
+
+        .toggle-btn:not(.active) .icon-badge {
+          color: #6b7280;
+          background: rgba(255, 255, 255, 0.7);
+        }
+
+        .toggle-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
       `}</style>
     </div>

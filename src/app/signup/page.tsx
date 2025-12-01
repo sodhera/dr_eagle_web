@@ -95,12 +95,7 @@ export default function SignupPage() {
                         {loading ? 'Creating account...' : 'Create an account'}
                     </button>
 
-                    <div className="checkbox-group">
-                        <input type="checkbox" id="updates" />
-                        <label htmlFor="updates">
-                            Please keep me updated by email with the latest news, research findings, reward programs, event updates.
-                        </label>
-                    </div>
+
                 </form>
 
                 <div className="footer">
@@ -116,7 +111,7 @@ export default function SignupPage() {
                 .title {
                     font-size: 1.8rem;
                     font-weight: 600;
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.25rem;
                     color: #111;
                     text-align: center;
                     font-family: var(--font-sans);
@@ -124,7 +119,7 @@ export default function SignupPage() {
 
                 .subtitle {
                     color: #666;
-                    margin-bottom: 2rem;
+                    margin-bottom: 1rem; /* Reduced margin */
                     text-align: center;
                     font-size: 0.95rem;
                 }
@@ -133,7 +128,7 @@ export default function SignupPage() {
                     display: flex;
                     align-items: center;
                     text-align: center;
-                    margin: 1.5rem 0;
+                    margin: 1rem 0; /* Reduced margin */
                     color: #999;
                     font-size: 0.8rem;
                 }
@@ -150,12 +145,12 @@ export default function SignupPage() {
                 }
 
                 .input-group {
-                    margin-bottom: 1.2rem;
+                    margin-bottom: 0.8rem; /* Reduced margin */
                 }
 
                 .input-group label {
                     display: block;
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.3rem; /* Reduced margin */
                     font-size: 0.9rem;
                     font-weight: 500;
                     color: #374151;
@@ -163,7 +158,7 @@ export default function SignupPage() {
 
                 .input-group input {
                     width: 100%;
-                    padding: 0.75rem;
+                    padding: 0.6rem; /* Slightly reduced padding */
                     border: 1px solid #e5e7eb;
                     border-radius: 8px;
                     font-size: 0.95rem;
@@ -186,8 +181,8 @@ export default function SignupPage() {
                     font-size: 1rem;
                     font-weight: 500;
                     cursor: pointer;
-                    margin-top: 1rem;
-                    margin-bottom: 1.5rem;
+                    margin-top: 0.8rem; /* Reduced margin */
+                    margin-bottom: 1rem; /* Reduced margin */
                     transition: background-color 0.2s;
                     font-family: var(--font-sans);
                 }
@@ -201,29 +196,21 @@ export default function SignupPage() {
                     cursor: not-allowed;
                 }
 
-                .checkbox-group {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 0.5rem;
-                    font-size: 0.8rem;
-                    color: #666;
-                    line-height: 1.4;
-                }
 
-                .checkbox-group input {
-                    margin-top: 0.2rem;
-                }
 
                 .footer {
                     text-align: center;
-                    margin-top: 2rem;
+                    margin-top: 1rem; /* Reduced margin */
                     font-size: 0.9rem;
                     color: #666;
                 }
 
                 .link {
-                    color: #000;
+                    color: #2563eb; /* Blue highlight */
                     font-weight: 600;
+                    text-decoration: none; /* Remove underline for cleaner look, or keep it if preferred. Let's remove it and rely on color/weight */
+                }
+                .link:hover {
                     text-decoration: underline;
                 }
 
