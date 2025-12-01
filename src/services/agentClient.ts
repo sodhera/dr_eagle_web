@@ -1,38 +1,11 @@
 import { getMcpToken } from './mcpAuth';
+import { ChatSession, Message, AgentStreamEvent } from '@/types/chat';
+
+// Re-export types for backward compatibility if needed by other files importing from here
+export type { ChatSession, Message, ToolCall, ChatMessage } from '@/types/chat';
 
 // Fixed URL as per plan.md
 const AGENT_BASE_URL = 'https://us-central1-audit-3a7ec.cloudfunctions.net';
-
-export interface ToolCall {
-    id: string;
-    type: 'function';
-    function: {
-        name: string;
-        arguments: string; // JSON string
-    };
-}
-
-export interface Message {
-    role: 'system' | 'user' | 'assistant' | 'tool';
-    content: string;
-    toolCalls?: ToolCall[];
-    toolCallId?: string;
-    timestamp: number;
-}
-
-export interface ChatSession {
-    id: string;
-    userId: string;
-    createdAt: number;
-    updatedAt: number;
-    messages: Message[];
-    customInstructions: string;
-    widgets: Record<string, any>;
-    title?: string; // Optional title if backend supports it or we store it locally
-}
-
-// Alias for backward compatibility if needed, or just replace usages
-export type ChatMessage = Message;
 
 export async function sendMessage(message: string, sessionId?: string): Promise<ChatSession> {
     const token = await getMcpToken();
@@ -55,6 +28,99 @@ export async function sendMessage(message: string, sessionId?: string): Promise<
     }
 
     return response.json();
+}
+
+export async function* streamChat(message: string, sessionId?: string): AsyncGenerator<AgentStreamEvent, void, unknown> {
+    const token = await getMcpToken();
+
+    const response = await fetch(`${AGENT_BASE_URL}/agent/chat/stream`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify({
+            message,
+            sessionId
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to start stream: ${response.status} ${errorText}`);
+    }
+
+    if (!response.body) {
+        throw new Error('Response body is null');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    const extractEvents = (): string[] => {
+        const events: string[] = [];
+        buffer = buffer.replace(/\r/g, '');
+
+        let delimiterIndex = buffer.indexOf('\n\n');
+        while (delimiterIndex !== -1) {
+            const rawEvent = buffer.slice(0, delimiterIndex).trim();
+            buffer = buffer.slice(delimiterIndex + 2);
+
+            if (rawEvent) {
+                const dataLines = rawEvent
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.startsWith('data:'));
+
+                if (dataLines.length > 0) {
+                    const payload = dataLines
+                        .map(line => line.replace(/^data:\s*/, ''))
+                        .join('\n');
+
+                    if (payload !== '[DONE]') {
+                        events.push(payload);
+                    }
+                }
+            }
+
+            delimiterIndex = buffer.indexOf('\n\n');
+        }
+        return events;
+    };
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                buffer += decoder.decode();
+                const remainingEvents = extractEvents();
+                for (const payload of remainingEvents) {
+                    try {
+                        const event = JSON.parse(payload) as AgentStreamEvent;
+                        yield event;
+                    } catch (e) {
+                        console.error('Error parsing SSE data:', e, payload);
+                    }
+                }
+                break;
+            }
+
+            buffer += decoder.decode(value, { stream: true });
+            const events = extractEvents();
+            for (const payload of events) {
+                try {
+                    const event = JSON.parse(payload) as AgentStreamEvent;
+                    yield event;
+                } catch (e) {
+                    console.error('Error parsing SSE data:', e, payload);
+                }
+            }
+        }
+    } finally {
+        reader.releaseLock();
+    }
 }
 
 export async function getChatHistory(sessionId: string): Promise<ChatSession> {

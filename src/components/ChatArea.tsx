@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import MessageInput from './MessageInput';
-import { sendMessage, Message, ToolCall } from '../services/agentClient';
+import { streamChat, sendMessage, Message, ToolCall } from '../services/agentClient';
 import { getWidgetForTool } from './WidgetRegistry';
 import ReactMarkdown from 'react-markdown';
 
@@ -39,7 +39,7 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
     setIsLoading(true);
 
     try {
-      await processChatLoop(newMessages, inputValue);
+      await processChatStream(newMessages, inputValue);
     } catch (error) {
       console.error("Chat error:", error);
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error.", timestamp: Date.now() / 1000 }]);
@@ -48,36 +48,108 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
     }
   };
 
-  const processChatLoop = async (currentMessages: Message[], originalInput: string) => {
-    // We only send the last user message to the agent API
-    // The agent handles history persistence on the backend
+  const processChatStream = async (currentMessages: Message[], originalInput: string) => {
     const lastMessage = currentMessages[currentMessages.length - 1];
     if (lastMessage.role !== 'user') return;
 
+    let streamSessionId = sessionId || null;
+    let fallbackTriggered = false;
 
-    // Pass the current sessionId (if any) to continue the chat
-    const response = await sendMessage(lastMessage.content, sessionId || undefined);
+    const runNonStreamingTurn = async (assistantMessageId?: number) => {
+      const targetSession = streamSessionId || undefined;
+      const session = await sendMessage(originalInput, targetSession);
 
-    // If we didn't have a session ID before, and the response has one, it's a new session
-    if (!sessionId && response.id) {
-      onSessionCreated(response.id, originalInput);
-    }
+      setMessages(prev => {
+        const baseMessages = assistantMessageId
+          ? prev.filter(msg => !(msg.role === 'assistant' && msg.timestamp === assistantMessageId))
+          : prev;
+        return [...baseMessages, ...session.messages];
+      });
 
-    // The backend returns the full session history.
-    // We need to find which messages are "new" (i.e., added after our last known message)
-    // and append ALL of them to our local state.
-    console.log("🔍 FULL BACKEND HISTORY:", JSON.stringify(response.messages, null, 2));
+      if (!targetSession && session.id) {
+        streamSessionId = session.id;
+        onSessionCreated(session.id, originalInput);
+      }
+    };
 
-    const lastKnownTimestamp = currentMessages[currentMessages.length - 1]?.timestamp || 0;
+    // Create a placeholder assistant message for streaming responses
+    const assistantMessageId = Date.now();
+    const assistantMessage: Message = {
+      role: 'assistant',
+      content: '',
+      timestamp: assistantMessageId
+    };
 
-    const newMessages = response.messages.filter(msg => {
-      // Filter out messages we already have based on timestamp
-      // Also filter out 'user' messages because we already added the user message optimistically
-      return (msg.timestamp || 0) > lastKnownTimestamp && msg.role !== 'user';
-    });
+    setMessages(prev => [...prev, assistantMessage]);
 
-    if (newMessages.length > 0) {
-      setMessages(prev => [...prev, ...newMessages]);
+    const removeAssistantPlaceholder = () => {
+      setMessages(prev =>
+        prev.filter(msg => !(msg.role === 'assistant' && msg.timestamp === assistantMessageId))
+      );
+    };
+
+    const attemptNonStreamingFallback = async () => {
+      if (fallbackTriggered) return true;
+      fallbackTriggered = true;
+      console.warn('Falling back to non-streaming chat request.');
+
+      try {
+        await runNonStreamingTurn(assistantMessageId);
+        return true;
+      } catch (fallbackError) {
+        console.error('Fallback chat request failed:', fallbackError);
+        return false;
+      }
+    };
+
+    try {
+      for await (const event of streamChat(lastMessage.content, sessionId || undefined)) {
+        console.log('Raw event:', event.type);
+        if (event.type === 'session_start') {
+          if (!sessionId) {
+            onSessionCreated(event.sessionId, originalInput);
+          }
+          streamSessionId = event.sessionId;
+        } else if (event.type === 'content') {
+          console.log('Content delta:', event.delta);
+          setMessages(prev => {
+            const newMsgs = [...prev];
+            const lastMsgIndex = newMsgs.length - 1;
+            const lastMsg = newMsgs[lastMsgIndex];
+
+            if (lastMsg.role === 'assistant' && lastMsg.timestamp === assistantMessageId) {
+              newMsgs[lastMsgIndex] = {
+                ...lastMsg,
+                content: lastMsg.content + event.delta
+              };
+            }
+            return newMsgs;
+          });
+        } else if (event.type === 'tool_start') {
+          // Optional: Show tool usage indicator
+          console.log('Tool start:', event.name);
+        } else if (event.type === 'tool_end') {
+          // Optional: Hide tool usage indicator or show result
+          console.log('Tool end:', event.result);
+        } else if (event.type === 'done') {
+          // Replace our local state with the authoritative session state from backend
+          // But be careful not to lose the user's scroll position or cause a jump
+          // For now, we might just want to ensure we have the full history.
+          // The 'done' event contains the full session.
+          // Let's merge or replace. Replacing is safer for consistency.
+          setMessages(event.session.messages);
+        } else if (event.type === 'error') {
+          console.error('Stream error:', event.error);
+          throw new Error(event.error);
+        }
+      }
+    } catch (error) {
+      console.error("Streaming failed:", error);
+      const fallbackHandled = await attemptNonStreamingFallback();
+      if (!fallbackHandled) {
+        removeAssistantPlaceholder();
+        throw error;
+      }
     }
   };
 

@@ -1,21 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
 import Homepage from '@/components/Homepage';
 import { getChatHistory, Message } from '@/services/agentClient';
 
-export default function Home() {
+function HomeContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [refreshSidebarTrigger, setRefreshSidebarTrigger] = useState(0);
+
+  const chatIdParam = searchParams.get('chatId');
+
+  useEffect(() => {
+    if (chatIdParam && chatIdParam !== currentSessionId && user) {
+      handleSelectChat(chatIdParam);
+    }
+  }, [chatIdParam, user]);
 
   if (loading) {
     return (
@@ -37,6 +46,9 @@ export default function Home() {
     setMessages([]);
     setInputValue('');
     setCurrentSessionId(null);
+    // Remove chatId from URL without reloading
+    const newUrl = window.location.pathname;
+    window.history.pushState({}, '', newUrl);
   };
 
   const handleSelectChat = async (sessionId: string) => {
@@ -65,7 +77,13 @@ export default function Home() {
         isOpen={isSidebarOpen}
         onToggle={handleToggleSidebar}
         onNewChat={handleNewChat}
-        onSelectChat={handleSelectChat}
+        onSelectChat={(id) => {
+          handleSelectChat(id);
+          // Optional: update URL to reflect selected chat
+          // router.push(`/?chatId=${id}`); 
+          // But maybe we don't want to force reload or clutter history if not needed.
+          // The user request implies they want the link to work.
+        }}
         currentSessionId={currentSessionId}
         refreshTrigger={refreshSidebarTrigger}
       />
@@ -101,5 +119,13 @@ export default function Home() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
