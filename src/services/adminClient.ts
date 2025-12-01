@@ -72,7 +72,15 @@ export interface TrackerQuery {
 }
 
 export async function fetchTrackers(params: TrackerQuery = {}): Promise<TrackerListResponse> {
-    const queryString = toQueryString(params);
+    const queryString = toQueryString({
+        userId: params.userId,
+        status: params.status,
+        targetType: params.targetType,
+        createdAfter: params.createdAfter,
+        createdBefore: params.createdBefore,
+        limit: params.limit,
+        pageToken: params.pageToken,
+    });
     const response = await adminFetch(`/admin/trackers${queryString}`);
     return response.json();
 }
