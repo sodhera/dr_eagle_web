@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
-import AuthLayout from '@/components/AuthLayout';
 import SocialButtons from '@/components/SocialButtons';
 
 export default function LoginPage() {
@@ -40,7 +39,7 @@ export default function LoginPage() {
     };
 
     return (
-        <AuthLayout mode="login">
+        <>
             <div className="form-container">
                 <h1 className="title">Welcome to Orecce</h1>
                 <p className="subtitle">Please enter your details to sign in.</p>
@@ -213,6 +212,6 @@ export default function LoginPage() {
                     margin-bottom: 1rem;
                 }
             `}</style>
-        </AuthLayout>
+        </>
     );
 }

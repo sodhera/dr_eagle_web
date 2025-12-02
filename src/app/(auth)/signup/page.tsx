@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
-import AuthLayout from '@/components/AuthLayout';
 import SocialButtons from '@/components/SocialButtons';
 
 export default function SignupPage() {
@@ -44,7 +43,7 @@ export default function SignupPage() {
     };
 
     return (
-        <AuthLayout mode="signup">
+        <>
             <div className="form-container">
                 <h1 className="title">Create an account</h1>
                 <p className="subtitle">Please enter your details to create an account.</p>
@@ -232,6 +231,6 @@ export default function SignupPage() {
                     margin-bottom: 1rem;
                 }
             `}</style>
-        </AuthLayout>
+        </>
     );
 }

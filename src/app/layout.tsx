@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, EB_Garamond } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { SidebarDataProvider } from "@/context/SidebarDataContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,7 +31,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${ebGaramond.variable}`}>
         <AuthProvider>
-          {children}
+          <SidebarDataProvider>
+            {children}
+          </SidebarDataProvider>
         </AuthProvider>
       </body>
     </html>

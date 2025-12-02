@@ -5,7 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
-import { getUserSessions, ChatSession, renameSession, deleteSession } from '@/services/agentClient';
+import { ChatSession, renameSession, deleteSession } from '@/services/agentClient';
+import { useSidebarData } from '@/context/SidebarDataContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -13,15 +14,13 @@ interface SidebarProps {
   onNewChat: () => void;
   onSelectChat: (sessionId: string) => void;
   currentSessionId: string | null;
-  refreshTrigger?: number; // Optional prop to force refresh
 }
 
-export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, currentSessionId, refreshTrigger }: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, currentSessionId }: SidebarProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const { chats, isLoading, setChats } = useSidebarData();
   const [showSettings, setShowSettings] = useState(false);
-  const [chats, setChats] = useState<ChatSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
@@ -29,25 +28,6 @@ export default function Sidebar({ isOpen, onToggle, onNewChat, onSelectChat, cur
   const settingsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (user) {
-      loadChats();
-    }
-  }, [user, refreshTrigger]);
-
-  const loadChats = async () => {
-    if (!user) return;
-    setIsLoading(true);
-    try {
-      const userChats = await getUserSessions();
-      setChats(userChats);
-    } catch (error) {
-      console.error("Failed to load chats:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleLogout = async () => {
     try {

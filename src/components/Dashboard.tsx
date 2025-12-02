@@ -138,9 +138,9 @@ export default function Dashboard() {
           border: 1px solid var(--border-subtle);
           border-radius: var(--radius-lg);
           padding: var(--spacing-md);
-          height: 300px;
           display: flex;
           flex-direction: column;
+          gap: var(--spacing-md);
         }
 
         .chart-card h3 {
@@ -151,9 +151,8 @@ export default function Dashboard() {
         }
 
         .chart-wrapper {
-          flex: 1;
           width: 100%;
-          min-height: 0;
+          height: 240px;
         }
       `}</style>
     </div>

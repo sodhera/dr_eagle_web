@@ -4,11 +4,7 @@ import React from 'react';
 import bgImage from '../../public/login-bg.png';
 import Image from 'next/image';
 import Link from 'next/link';
-
-interface AuthLayoutProps {
-  children: React.ReactNode;
-  mode: 'login' | 'signup';
-}
+import { usePathname } from 'next/navigation';
 
 const LoginIcon = () => (
   <svg
@@ -78,7 +74,11 @@ const SignupIcon = () => (
   </svg>
 );
 
-export default function AuthLayout({ children, mode }: AuthLayoutProps) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isLogin = pathname === '/login';
+  const isSignup = pathname === '/signup';
+
   return (
     <div className="auth-container">
       {/* Left Side - Image & Testimonial */}
@@ -119,20 +119,20 @@ export default function AuthLayout({ children, mode }: AuthLayoutProps) {
           <div className="auth-toggle">
             <Link
               href="/login"
-              aria-current={mode === 'login' ? 'page' : undefined}
+              aria-current={isLogin ? 'page' : undefined}
               className="toggle-link"
             >
-              <span className={`toggle-btn ${mode === 'login' ? 'active' : ''}`}>
+              <span className={`toggle-btn ${isLogin ? 'active' : ''}`}>
                 <LoginIcon />
                 <span>Login</span>
               </span>
             </Link>
             <Link
               href="/signup"
-              aria-current={mode === 'signup' ? 'page' : undefined}
+              aria-current={isSignup ? 'page' : undefined}
               className="toggle-link"
             >
-              <span className={`toggle-btn ${mode === 'signup' ? 'active' : ''}`}>
+              <span className={`toggle-btn ${isSignup ? 'active' : ''}`}>
                 <SignupIcon />
                 <span>Sign Up</span>
               </span>

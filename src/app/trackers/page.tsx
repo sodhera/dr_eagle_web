@@ -9,9 +9,10 @@ import { Tracker } from '@/types/tracking';
 import CentralTrackerWidget from '@/components/trackers/CentralTrackerWidget';
 import TrackerCard from '@/components/trackers/TrackerCard';
 import TrackerDetailModal from '@/components/trackers/TrackerDetailModal';
+import { useSidebarData } from '@/context/SidebarDataContext';
 
 export default function TrackersPage() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { isSidebarOpen, toggleSidebar } = useSidebarData();
     const [trackers, setTrackers] = useState<Tracker[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTracker, setSelectedTracker] = useState<Tracker | null>(null);
@@ -50,7 +51,7 @@ export default function TrackersPage() {
         <div className="page-container">
             <Sidebar
                 isOpen={isSidebarOpen}
-                onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+                onToggle={toggleSidebar}
                 onNewChat={() => router.push('/')}
                 onSelectChat={(sessionId: string) => router.push(`/?chatId=${sessionId}`)}
                 currentSessionId={null}

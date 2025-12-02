@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useSidebarData } from '@/context/SidebarDataContext';
 import Sidebar from '@/components/Sidebar';
 
 export default function EditMemoryPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed or open? Home defaults to false.
+    const { isSidebarOpen, toggleSidebar } = useSidebarData();
     const [memoryText, setMemoryText] = useState('');
-    const [refreshSidebarTrigger, setRefreshSidebarTrigger] = useState(0);
 
     useEffect(() => {
         if (!loading && !user) {
@@ -29,10 +29,6 @@ export default function EditMemoryPage() {
     if (!user) {
         return null;
     }
-
-    const handleToggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
 
     const handleNewChat = () => {
         router.push('/');
@@ -59,11 +55,10 @@ export default function EditMemoryPage() {
         <div className="app-container">
             <Sidebar
                 isOpen={isSidebarOpen}
-                onToggle={handleToggleSidebar}
+                onToggle={toggleSidebar}
                 onNewChat={handleNewChat}
                 onSelectChat={handleSelectChat}
                 currentSessionId={null} // No active chat session on this page
-                refreshTrigger={refreshSidebarTrigger}
             />
             <div className={`main-content ${!isSidebarOpen ? 'expanded' : ''}`}>
                 <div className="edit-container">

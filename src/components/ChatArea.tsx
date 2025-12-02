@@ -412,6 +412,24 @@ export default function ChatArea({ messages, inputValue, onInputChange, onSugges
           50% { content: '..'; }
           75% { content: '...'; }
         }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-row {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        .message-text :global(p), 
+        .message-text :global(li),
+        .message-text :global(h1),
+        .message-text :global(h2),
+        .message-text :global(h3),
+        .message-text :global(pre) {
+          animation: fadeIn 0.3s ease-out;
+        }
       `}</style>
     </main>
   );

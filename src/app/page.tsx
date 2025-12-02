@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useSidebarData } from '@/context/SidebarDataContext';
 import Sidebar from '@/components/Sidebar';
 import ChatArea from '@/components/ChatArea';
 import Homepage from '@/components/Homepage';
@@ -12,11 +13,10 @@ function HomeContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { refreshChats, isSidebarOpen, toggleSidebar } = useSidebarData();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [refreshSidebarTrigger, setRefreshSidebarTrigger] = useState(0);
 
   const chatIdParam = searchParams.get('chatId');
 
@@ -37,10 +37,6 @@ function HomeContent() {
   if (!user) {
     return <Homepage />;
   }
-
-  const handleToggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   const handleNewChat = () => {
     setMessages([]);
@@ -64,7 +60,7 @@ function HomeContent() {
   const handleSessionCreated = (sessionId: string, firstMessage: string) => {
     setCurrentSessionId(sessionId);
     // Trigger sidebar refresh to show the new chat
-    setRefreshSidebarTrigger(prev => prev + 1);
+    void refreshChats();
   };
 
   const handleSuggestionClick = (text: string) => {
@@ -75,7 +71,7 @@ function HomeContent() {
     <div className="app-container">
       <Sidebar
         isOpen={isSidebarOpen}
-        onToggle={handleToggleSidebar}
+        onToggle={toggleSidebar}
         onNewChat={handleNewChat}
         onSelectChat={(id) => {
           handleSelectChat(id);
@@ -85,7 +81,6 @@ function HomeContent() {
           // The user request implies they want the link to work.
         }}
         currentSessionId={currentSessionId}
-        refreshTrigger={refreshSidebarTrigger}
       />
       <div className={`main-content ${!isSidebarOpen ? 'expanded' : ''}`}>
         {!isSidebarOpen && (
